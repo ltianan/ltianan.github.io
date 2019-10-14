@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The web site of angle</title>
+    <!-- The style.css file allows you to change the look of your web pages.
+         If you include the next line in all your web pages, they will all share the same look.
+         This makes it easier to make new pages for your site. -->
+    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+        <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+    .m{
+      background:url(./images/timg.jpg) no-repeat center fixed
+      }
+    
+    </style>
+  </head>
+  <body class="m">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="/">Payload Examples</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav align-items-center mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" style="cursor: default;" href="/JavaGetSetReverse.html" >反向赋值</a>
+            </li>
+            <li>
+                <a class="nav-link" href="/isbn.html" id="isbn"
+                data-busy="href">ISBN Helper <span class="sr-only">(current)</span></a>
+            </li>
+            <li>
+                <label for='submit-form' class="nav-link m-0" >Login</label> <span class="sr-only">(current)</span>
+            </li>
+        </ul>
+        <form method="POST" class="d-none d-md-flex">
+            <a class="navbar-brand" style="cursor: default;" href="#">Choose OAuth Scheme:</a>
+            <select class="form-control mx-3" id="authType" name="authType">
+                <option>Auth</option>
+                <option>Grant</option>
+                <option disabled>Code</option>
+            </select>
+            <input type="submit" id="submit-form" class="btn btn-secondary">
+        </form>
+    </div>
+</nav>
+
+    <p>To learn more HTML/CSS, check out these <a href="https://neocities.org/tutorials">tutorials</a>!</p>
+  
+  
+  <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+  
+</html>
