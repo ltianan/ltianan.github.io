@@ -1,0 +1,53 @@
+<meta charset="utf-8">
+<title>JavaGetSetReverse</title>
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
+	
+</script>
+<script>
+	$(document).ready(function() {
+		$("#b").click(function() {
+			
+			$("#d").val("");
+			var content ={};
+			content=$("#s").val().split("\n");
+			var result="";
+			$.each(content,function(k,v){
+			v=v.trim();
+			var a=v.substring(0,v.indexOf("("));
+			var b=v.substring(v.indexOf("(")+1,v.indexOf("(",v.indexOf("(")+1));
+			var v2=v.replace(a,b).replace(".get",".set").replace(b,a).replace(".set",".get").replace(".s",".g").replace(".g",".s");
+				console.log("a"+a);
+				console.log("b"+b);
+				console.log("v2"+v2);
+			v2=v2+"\n";
+			result=result+v2;
+			});
+			$("#d").val(result);
+		});
+	});
+</script>
+<style>
+.fl {
+	float: left;
+}
+</style>
+</head>
+<body>
+	<div class="fl">
+		<textarea id="s" style="width: 500px; height: 500px"></textarea>
+		&nbsp&nbsp&nbsp
+	</div>
+	<div class="fl">
+		<input id="b" type="button" value="转换"> &nbsp&nbsp&nbsp
+	</div>
+	<div class="fl">
+		<textarea id="d" style="width: 500px; height: 500px"></textarea>
+	</div>
+	<div>
+		<p>例如：</p>
+		源：b.setReaderNo(o.getReaderbarcode());
+		将转换为：o.setReaderbarcode(b.getReaderNo());
+	</div>
+
+</body>
+</html>
