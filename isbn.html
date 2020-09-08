@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The web site of angle</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap-theme.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div>
+            <label class="">ISBN</label><input type="text" id="isbn"/>
+            <label class="">条形码</label><input type="text" id="barcode"/>
+            <button id="change" type="button">转换</button>
+        </div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script>
+            $().ready(function () {
+                $("#change").click(function(){
+                    var isbn=$("#isbn").val();
+                    var barcode=$("#barcode").val();
+                    if(isbn!=""){
+                        if(isbn.replace('-','').length>=12){
+                            var tiaoma=isbntiaoma(isbn)
+                        }
+                        $("#barcode").val(tiaoma);
+                    }
+                });
+
+            });
+            function isbntiaoma(input) {
+			if(input==null){
+				input="";
+			}
+			var result=input;
+			if(input.indexOf(";")>0) {
+				input=input.substring(0,input.indexOf(";"));
+			}
+			var digits = input.replace(/ /g, "").replace(/-/g, "").trim();
+			//统一到13位isbn，末尾校验位可能错误，接下来会校正。
+			if(digits.length==10){
+				
+				digits="978"+digits;
+			}
+			
+			//{12d+1[dxX]}
+			var regexIsbnCheck="^[\\d]{12}.";//判断前12位是否未数字
+			
+			if(digits.match(regexIsbnCheck)) {
+			if(digits.length>=12){
+				digits=digits.substring(0, 13);
+				var isbn1="";
+				isbn1 = digits.substring(0,digits.length-1);
+				var jshu =0;
+				var oshu=0;
+				for(var i=0;i<=11;i++){
+					if(((i%2)==0)){
+						jshu=jshu+parseInt(isbn1.charAt(i));
+					}else{
+						 oshu =oshu+parseInt(isbn1.charAt(i));
+					}
+				}
+				var sum = oshu*3+jshu;
+				var mod = sum%10;
+				var mod1 = 10-mod;
+				var str = "";
+				if(mod1==10){
+					str = "0";
+				}else{
+					str = mod1; 
+				}
+				digits=digits.substring(0,digits.length-1)+str;
+				result=digits;
+			}
+			}
+			return result;
+		}
+        </script>
+    </body>
+</html>
