@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>My-Work-Helper</title>
+    <title>Work-Helper</title>
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
@@ -22,27 +22,59 @@
         border-top-left-radius: .25rem;
         border-top-right-radius: .25rem;
     }
+    .hide{
+        display: none;
+    }
 </style>
 <script>
-    Date.prototype.format = function(fmt) {
-    var o = {
-        "M+": this.getMonth() + 1, //月份
-        "d+": this.getDate(), //日
-        "h+": this.getHours(), //小时
-        "m+": this.getMinutes(), //分
-        "s+": this.getSeconds(), //秒
-        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S": this.getMilliseconds() //毫秒
-    };
-    if (/(y+)/.test(fmt))
-        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
-        if (new RegExp("(" + k + ")").test(fmt))
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-    return fmt;
-}
+    var copy_txt = function () {//无组件复制
+            var _this = this;
+            this.copy = function (txt) {
+
+                $("#input_copy_txt_to_board").val(txt);//赋值
+                $("#input_copy_txt_to_board").removeClass("hide");//显示
+                $("#input_copy_txt_to_board").focus();//取得焦点
+                $("#input_copy_txt_to_board").select();//选择
+                document.execCommand("Copy");
+                $("#input_copy_txt_to_board").addClass("hide");//隐藏
+            }
+
+            //-----------
+            let html = '<textarea type class="hide" id="input_copy_txt_to_board" value="" /></textarea>';//添加一个隐藏的元素
+            $("body").append(html);
+        }
+    Date.prototype.format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
     $(document).ready(function () {
+        $("#tip1").val(
+                'beeline'+'\n'+'use szdsjsxm_sj;'+'\n'+'set hive.execution.engine=spark;'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
+
+            );
+        $("#tip2").val(
+                'spark-beeline\n'
+            );
+
+            $("#order_no,#order_no2").click(function(){
+                $(this).select();
+            });
         $("#generate1").click(function () {
+            $("#helper").show();
+            $("#alltips").addClass("hide");
             var date = new Date().format("yyyyMMdd");
             var me=$("#me").val();
             me=me==""? $("#me").attr("placeholder"):me;
@@ -53,8 +85,8 @@
             tablename=tablename==""? $("#tablename").attr("placeholder"):tablename;
             var tablealias = $("#tablealias").val();
             tablealias=tablealias==""? $("#tablealias").attr("placeholder"):tablealias;
-            var cc=$("#cc").val();
-            cc=cc==""? $("#cc").attr("placeholder"):cc;
+            var fq=$("#fq").val();
+            // fq=fq==""? $("#fq").attr("placeholder"):fq;
             var px=$("#px").val();
             px=px==""? $("#px").attr("placeholder"):px;
 
@@ -65,11 +97,49 @@
                 "put "+order_no+".zip"+"\n"+
                 "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"
             );
+            var partition_by=fq==""?fq:"partition by "+fq+" ";
             $("#sql_tip").text(
-                "select * from "+"\n"+"(select a.*,row_number() over(partition by "+cc+" order by "+px+") rn from "+tablename + " a) a where rn=1;"
-            );
+                "select * from (select a.*,row_number() over("+partition_by+"order by "+px+") rn"+tablealias+" from "+tablename + " a) "+tablealias+" where rn"+tablealias+"=1;"
+            );            
 
         });
+        var ct =new copy_txt();  
+        $("input").each(function(){
+            var val=$(this).val();
+            ct.copy(val);
+        });
+        $('textarea,code').on('click', function () {
+            $(this).select();
+            var val1=$(this).val();
+            var val2=$(this).text();
+            var val=val2==""?val1:val2;
+            ct.copy(val);
+            $(this).select();
+            $(this).blur();
+        });
+        $("#mytips").click(function () {
+            $("#helper").hide();
+            $("#alltips").removeClass("hide");
+            var wod=$("#wod").val();
+            var order_no=$("#order_no2").val();
+            order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+            var operator=$("#operator").val();
+            operator=operator==""? $("#operator").attr("placeholder"):operator;
+            var workhours=$("#workhours").val();
+            workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+            var appendix=$("#appendix").val();
+            appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+            $("#huidan1").val(
+                "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+            $("#huidan2").val(
+                "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+            $("#huidan3").val(
+                "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+
+        })
     });
 </script>
 
@@ -77,19 +147,19 @@
     <div class="container">
         <div class="bd-example">
             <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
+            <button id="mytips" type="button" class="btn btn-outline-success">TIPS</button>
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
-            <button type="button" class="btn btn-outline-success">Success</button>
             <button type="button" class="btn btn-outline-danger">Danger</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
             <button type="button" class="btn btn-outline-info">Info</button>
             <button type="button" class="btn btn-outline-light">Light</button>
             <button type="button" class="btn btn-outline-dark">Dark</button> -->
         </div>
-        <div class="row">
+        <div id="helper" class="row">
             <div class="col-sm-5">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">表名</span>
-                    <input id="tablename" type="text" class="form-control" placeholder="szdsjsxm_sj.IN_tw_Fra_invo_ana_wat_d_sz" aria-label="szdsjsxm_sj.IN_tw_Fra_invo_ana_wat_d_sz"
+                    <input id="tablename" type="text" class="form-control" placeholder="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ" aria-label="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ"
                     aria-describedby="basic-addon1">
                 </div>
 
@@ -99,14 +169,14 @@
                     aria-describedby="basic-addon2">
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon3">查重字段</span>
-                    <input id="cc" type="text" class="form-control" placeholder="nbr" aria-label="nbr"
+                    <span class="input-group-text" id="basic-addon3">分区字段</span>
+                    <input id="fq" type="text" class="form-control" placeholder="" aria-label="" 
                     aria-describedby="basic-addon3">
                 </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon4">排序字段</span>
-                    <input id="px" type="text" class="form-control" placeholder="start_dt asc" aria-label="start_dt asc"
+                    <input id="px" type="text" class="form-control" placeholder="day desc" aria-label="day desc"
                     aria-describedby="basic-addon4">
                 </div>
 
@@ -117,9 +187,12 @@
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="other_tips" rows="10" class="form-control" aria-label="tips"></textarea>
+                    <textarea id="tip1" rows="6" class="form-control" aria-label="tips"></textarea>
                 </div>
-
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="tip2" rows="2" class="form-control" aria-label="tips"></textarea>
+                </div>
 
             </div>
             <div class="col-sm-7">
@@ -142,9 +215,52 @@
                     <textarea id="result" rows="12" class="form-control" aria-label="结果"></textarea>
                 </div>
             </div>
+        </div>
 
+        <div id="alltips" class="row hide">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <input id="order_no2" type="text" class="form-control" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
+                    aria-describedby="basic-addon0">
+                    <span class="input-group-text" id="basic-addon0">单号</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon5">工单描述</span>
+                    <input id="wod" type="text" class="form-control" placeholder="关于提取XXX的需求" aria-label="关于提取XXX的需求"
+                    aria-describedby="basic-addon5">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon6">处理人</span>
+                    <input id="operator" type="text" class="form-control" placeholder="Angle" aria-label="Angle"
+                    aria-describedby="basic-addon6">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon7">工时(小时)</span>
+                    <input id="workhours" type="text" class="form-control" placeholder="8" aria-label="8"
+                    aria-describedby="basic-addon7">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon8">附件名称</span>
+                    <input id="appendix" type="text" class="form-control" placeholder="result.xlsx" aria-label="result.xlsx"
+                    aria-describedby="basic-addon8">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan1" rows="4" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan2" rows="3" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan3" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6"></div>
         </div>
     </div>
+
 
 </body>
 
