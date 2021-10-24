@@ -1,0 +1,151 @@
+<html>
+
+<head>
+    <title>My-Work-Helper</title>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <!-- jQuery and JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+</head>
+<style>
+    .bd-example {
+        padding: 1.5rem;
+        margin-right: 0;
+        margin-left: 0;
+        border-width: 1px;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+    }
+</style>
+<script>
+    Date.prototype.format = function(fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+    $(document).ready(function () {
+        $("#generate1").click(function () {
+            var date = new Date().format("yyyyMMdd");
+            var me=$("#me").val();
+            me=me==""? $("#me").attr("placeholder"):me;
+            var order_no=$("#order_no").val();
+            order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
+            var order_no_last6=order_no.substring(order_no.length-6);
+            var tablename = $("#tablename").val();
+            tablename=tablename==""? $("#tablename").attr("placeholder"):tablename;
+            var tablealias = $("#tablealias").val();
+            tablealias=tablealias==""? $("#tablealias").attr("placeholder"):tablealias;
+            var cc=$("#cc").val();
+            cc=cc==""? $("#cc").attr("placeholder"):cc;
+            var px=$("#px").val();
+            px=px==""? $("#px").attr("placeholder"):px;
+
+
+            $("#result").val(me+"_"+date+"_"+order_no_last6+"_");
+            $("#upload_tip").val(
+                "zip -re "+order_no+".zip"+"\n"+
+                "put "+order_no+".zip"+"\n"+
+                "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"
+            );
+            $("#sql_tip").text(
+                "select * from "+"\n"+"(select a.*,row_number() over(partition by "+cc+" order by "+px+") rn from "+tablename + " a) a where rn=1;"
+            );
+
+        });
+    });
+</script>
+
+<body>
+    <div class="container">
+        <div class="bd-example">
+            <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
+            <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
+            <button type="button" class="btn btn-outline-success">Success</button>
+            <button type="button" class="btn btn-outline-danger">Danger</button>
+            <button type="button" class="btn btn-outline-warning">Warning</button>
+            <button type="button" class="btn btn-outline-info">Info</button>
+            <button type="button" class="btn btn-outline-light">Light</button>
+            <button type="button" class="btn btn-outline-dark">Dark</button> -->
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1">表名</span>
+                    <input id="tablename" type="text" class="form-control" placeholder="szdsjsxm_sj.IN_tw_Fra_invo_ana_wat_d_sz" aria-label="szdsjsxm_sj.IN_tw_Fra_invo_ana_wat_d_sz"
+                    aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon2">表别名</span>
+                    <input id="tablealias" type="text" class="form-control" placeholder="a" aria-label="a"
+                    aria-describedby="basic-addon2">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon3">查重字段</span>
+                    <input id="cc" type="text" class="form-control" placeholder="nbr" aria-label="nbr"
+                    aria-describedby="basic-addon3">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon4">排序字段</span>
+                    <input id="px" type="text" class="form-control" placeholder="start_dt asc" aria-label="start_dt asc"
+                    aria-describedby="basic-addon4">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip" rows="12" class="form-control" aria-label="SQL"></code>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="other_tips" rows="10" class="form-control" aria-label="tips"></textarea>
+                </div>
+
+
+            </div>
+            <div class="col-sm-7">
+                <div class="input-group mb-3">
+                    <input id="me" type="text" class="form-control" placeholder="lta" aria-label="lta"
+                    aria-describedby="me">
+                    <span class="input-group-text" id="me">名字</span>
+                </div>
+                <div class="input-group mb-3">
+                    <input id="order_no" type="text" class="form-control" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
+                    aria-describedby="basic-addon0">
+                    <span class="input-group-text" id="basic-addon0">单号</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">上传</span>
+                    <textarea id="upload_tip" rows="4" class="form-control" aria-label="上传"></textarea>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text">结果</span>
+                    <textarea id="result" rows="12" class="form-control" aria-label="结果"></textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
