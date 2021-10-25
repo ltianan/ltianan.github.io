@@ -100,7 +100,19 @@
             var partition_by=fq==""?fq:"partition by "+fq+" ";
             $("#sql_tip").text(
                 "select * from (select a.*,row_number() over("+partition_by+"order by "+px+") rn"+tablealias+" from "+tablename + " a) "+tablealias+" where rn"+tablealias+"=1;"
-            );            
+            );
+            var cc=$("#cc").val();
+            cc=cc==""? $("#cc").attr("placeholder"):cc;
+            $("#sql_tip2").text(
+                "select count(1),count("+cc+"),count(distinct "+cc+") from "+tablename + " "+tablealias+";"
+            );
+            var lastmonth=new Date(new Date().setMonth((new Date().getMonth()-1))).format("yyyyMM");
+            console.log(lastmonth);
+            $("#sql_tip3").text(
+                "select day,count(1),count("+cc+"),count(distinct "+cc+") from "+tablename + " "+tablealias+" where month="+lastmonth+" group by day;"
+            );
+
+
 
         });
         var ct =new copy_txt();  
@@ -181,18 +193,27 @@
                 </div>
 
                 <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon10">查重字段</span>
+                    <input id="cc" type="text" class="form-control" placeholder="usr_nbr" aria-label="usr_nbr"
+                    aria-describedby="basic-addon10">
+                </div>
+
+                <div class="input-group mb-3">
                     <span class="input-group-text">SQL</span>
                     <code id="sql_tip" rows="12" class="form-control" aria-label="SQL"></code>
                 </div>
 
                 <div class="input-group mb-3">
-                    <span class="input-group-text">TIP</span>
-                    <textarea id="tip1" rows="6" class="form-control" aria-label="tips"></textarea>
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip2" rows="12" class="form-control" aria-label="SQL"></code>
                 </div>
+
                 <div class="input-group mb-3">
-                    <span class="input-group-text">TIP</span>
-                    <textarea id="tip2" rows="2" class="form-control" aria-label="tips"></textarea>
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip3" rows="12" class="form-control" aria-label="SQL"></code>
                 </div>
+
+
 
             </div>
             <div class="col-sm-7">
@@ -210,9 +231,17 @@
                     <span class="input-group-text">上传</span>
                     <textarea id="upload_tip" rows="4" class="form-control" aria-label="上传"></textarea>
                 </div>
-                <div class="input-group">
+                <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
-                    <textarea id="result" rows="12" class="form-control" aria-label="结果"></textarea>
+                    <textarea id="result" rows="3" class="form-control" aria-label="结果"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="tip1" rows="6" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="tip2" rows="2" class="form-control" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
