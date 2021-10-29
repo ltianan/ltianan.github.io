@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Work-Helper</title>
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
@@ -14,6 +15,30 @@
         crossorigin="anonymous"></script>
 </head>
 <style>
+    ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color: red!important;
+    }
+    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color: red!important;
+    }
+    ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color: red!important;
+    }
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: red!important;
+    }
+    .form-control{
+        background-color: transparent;
+    }
+    .input-group-text{
+        background-color: transparent;
+    }
+    .m{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f393f0), to(#fdc3c3))
+    }
+    .trans{
+        background-color: transparent;
+    }
     .bd-example {
         padding: 1.5rem;
         margin-right: 0;
@@ -24,6 +49,9 @@
     }
     .hide{
         display: none;
+    }
+    .autocopy{
+        border-color:rgb(156, 122, 88);
     }
 </style>
 <script>
@@ -91,11 +119,13 @@
             px=px==""? $("#px").attr("placeholder"):px;
 
 
-            $("#result").val(me+"_"+date+"_"+order_no_last6+"_");
+            $("#result").val("create table szdsjsxm_sj."+me+"_"+date+"_"+order_no_last6+"_"+
+            "\nrow format delimited fields terminated by '|' stored as textfile tblproperties (\n'serialization.null.format' = '',\n'serialization.encoding' = 'GBK'\n) as\n");
             $("#upload_tip").val(
                 "zip -re "+order_no+".zip"+"\n"+
                 "put "+order_no+".zip"+"\n"+
-                "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"
+                "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"+"\n"+
+                "chmod 777 ./"+order_no+".zip"
             );
             var partition_by=fq==""?fq:"partition by "+fq+" ";
             $("#sql_tip").text(
@@ -104,12 +134,40 @@
             var cc=$("#cc").val();
             cc=cc==""? $("#cc").attr("placeholder"):cc;
             $("#sql_tip2").text(
-                "select count(1),count("+cc+"),count(distinct "+cc+") from "+tablename + " "+tablealias+";"
+                "select" + "\n" +
+                "    count(1)," + "\n" +
+                "    count(usr_nbr)," + "\n" +
+                "    count(distinct usr_nbr)" + "\n" +
+                "from" + "\n" +
+                "    "+tablename + " " + tablealias + ";"
             );
             var lastmonth=new Date(new Date().setMonth((new Date().getMonth()-1))).format("yyyyMM");
             console.log(lastmonth);
             $("#sql_tip3").text(
-                "select day,count(1),count("+cc+"),count(distinct "+cc+") from "+tablename + " "+tablealias+" where month="+lastmonth+" group by day;"
+                "select" + "\n" +
+                "    day," + "\n" +
+                "    count(1)," + "\n" +
+                "    count(usr_nbr)," + "\n" +
+                "    count(distinct usr_nbr)" + "\n" +
+                "from" + "\n" +
+                "    "+tablename + " " + tablealias + "\n" +
+                "where" + "\n" +
+                "    month = 202109" + "\n" +
+                "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + 10 + ")" + "\n" +
+                "group by" + "\n" +
+                "    day;"
+            );
+            var year=$("#year").val();
+            year=year==""? $("#year").attr("placeholder"):year;
+            var febday=28;
+            if(year%4==0&&year%100!=0||year%400==0){
+                febday=29
+            }
+            $("#sql_tip4").text(
+                year+"01,"+year+"02,"+year+"03,"+year+"04,"+year+"05,"+year+"06,"+year+"07,"+year+"08,"+
+                year+"09,"+year+"10,"+year+"11,"+year+"12"+"\n"+
+                year+"0101,"+year+"02"+febday+","+year+"0331,"+year+"0430,"+year+"0531,"+year+"0630,"+year+"0731,"+
+                year+"0831,"+year+"0930,"+year+"1031,"+year+"1130,"+year+"1231"
             );
 
 
@@ -120,7 +178,7 @@
             var val=$(this).val();
             ct.copy(val);
         });
-        $('textarea,code').on('click', function () {
+        $('.autocopy').on('click', function () {
             $(this).select();
             var val1=$(this).val();
             var val2=$(this).text();
@@ -155,9 +213,10 @@
     });
 </script>
 
-<body>
+<body class="m">
     <div class="container">
         <div class="bd-example">
+            <img class="logo" src="images/Logox.png" width="150px" alt="Logo">
             <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
             <button id="mytips" type="button" class="btn btn-outline-success">TIPS</button>
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
@@ -199,20 +258,29 @@
                 </div>
 
                 <div class="input-group mb-3">
-                    <span class="input-group-text">SQL</span>
-                    <code id="sql_tip" rows="12" class="form-control" aria-label="SQL"></code>
+                    <span class="input-group-text" id="basic-addon12">年份</span>
+                    <input id="year" type="text" class="form-control" placeholder="2021" aria-label="2021"
+                    aria-describedby="basic-addon12">
                 </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">SQL</span>
-                    <code id="sql_tip2" rows="12" class="form-control" aria-label="SQL"></code>
+                    <code id="sql_tip" rows="12" class="form-control autocopy" aria-label="SQL"></code>
                 </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">SQL</span>
-                    <code id="sql_tip3" rows="12" class="form-control" aria-label="SQL"></code>
+                    <code id="sql_tip2" rows="12" class="form-control autocopy" aria-label="SQL"></code>
                 </div>
 
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip3" rows="12" class="form-control autocopy" aria-label="SQL"></code>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip4" rows="12" class="form-control" aria-label="SQL"></code>
+                </div>
 
 
             </div>
@@ -229,19 +297,19 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">上传</span>
-                    <textarea id="upload_tip" rows="4" class="form-control" aria-label="上传"></textarea>
+                    <textarea  id="upload_tip" rows="5" class="form-control" aria-label="上传"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
-                    <textarea id="result" rows="3" class="form-control" aria-label="结果"></textarea>
+                    <textarea id="result" rows="3" class="form-control autocopy" aria-label="结果"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip1" rows="6" class="form-control" aria-label="tips"></textarea>
+                    <textarea id="tip1" rows="6" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip2" rows="2" class="form-control" aria-label="tips"></textarea>
+                    <textarea id="tip2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
@@ -289,6 +357,7 @@
             <div class="col-sm-6"></div>
         </div>
     </div>
+
 
 
 </body>
