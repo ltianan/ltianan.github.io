@@ -15,6 +15,29 @@
         crossorigin="anonymous"></script>
 </head>
 <style>
+
+    textarea:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="datetime"]:focus,
+    input[type="datetime-local"]:focus,
+    input[type="date"]:focus,
+    input[type="month"]:focus,
+    input[type="time"]:focus,
+    input[type="week"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="url"]:focus,
+    input[type="search"]:focus,
+    input[type="tel"]:focus,
+    input[type="color"]:focus,
+    .uneditable-input:focus {   
+    border-color: rgba(201, 104, 239, 0.8);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+    outline: 0 none;
+    background-color:transparent;
+    }
+
     ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
         color: red!important;
     }
@@ -29,9 +52,12 @@
     }
     .form-control{
         background-color: transparent;
+        border:1px solid #bb36a6;
     }
     .input-group-text{
         background-color: transparent;
+        border:1px solid #bb36a6;
+        color: #97353d;
     }
     .m{
         background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f393f0), to(#fdc3c3))
@@ -89,6 +115,7 @@
             return fmt;
         }
     $(document).ready(function () {
+        $("input").attr("autocomplete","off");
         $("#tip1").val(
                 'beeline'+'\n'+'use szdsjsxm_sj;'+'\n'+'set hive.execution.engine=spark;'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
 
@@ -136,8 +163,8 @@
             $("#sql_tip2").text(
                 "select" + "\n" +
                 "    count(1)," + "\n" +
-                "    count(usr_nbr)," + "\n" +
-                "    count(distinct usr_nbr)" + "\n" +
+                "    count("+cc+")," + "\n" +
+                "    count(distinct "+cc+")" + "\n" +
                 "from" + "\n" +
                 "    "+tablename + " " + tablealias + ";"
             );
@@ -147,8 +174,8 @@
                 "select" + "\n" +
                 "    day," + "\n" +
                 "    count(1)," + "\n" +
-                "    count(usr_nbr)," + "\n" +
-                "    count(distinct usr_nbr)" + "\n" +
+                "    count("+cc+")," + "\n" +
+                "    count(distinct "+cc+")" + "\n" +
                 "from" + "\n" +
                 "    "+tablename + " " + tablealias + "\n" +
                 "where" + "\n" +
@@ -190,27 +217,32 @@
         $("#mytips").click(function () {
             $("#helper").hide();
             $("#alltips").removeClass("hide");
-            var wod=$("#wod").val();
-            var order_no=$("#order_no2").val();
-            order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
-            var operator=$("#operator").val();
-            operator=operator==""? $("#operator").attr("placeholder"):operator;
-            var workhours=$("#workhours").val();
-            workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
-            var appendix=$("#appendix").val();
-            appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
-            $("#huidan1").val(
-                "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
-            $("#huidan2").val(
-                "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
-            $("#huidan3").val(
-                "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
-
+            huidan();
         })
+        $("#wod,#order_no2,#workhours,#appendix,#operator").keyup(huidan);
+
     });
+    function huidan(){
+        var wod=$("#wod").val();
+        var order_no=$("#order_no2").val();
+        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+        var operator=$("#operator").val();
+        operator=operator==""? $("#operator").attr("placeholder"):operator;
+        var workhours=$("#workhours").val();
+        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+        var appendix=$("#appendix").val();
+        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+        $("#huidan1").val(
+            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan2").val(
+            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan3").val(
+            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+    }
+
 </script>
 
 <body class="m">
