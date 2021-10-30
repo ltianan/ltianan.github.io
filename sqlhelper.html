@@ -115,6 +115,16 @@
             return fmt;
         }
     $(document).ready(function () {
+        if(localStorage.getItem("order_no2")!=undefined){
+            $("#order_no2").val(localStorage.getItem("order_no2"));
+        }
+        if(localStorage.getItem("operator")!=undefined){
+            $("#operator").val(localStorage.getItem("operator"));
+        }
+        if(localStorage.getItem("me")!=undefined){
+            $("#me").val(localStorage.getItem("me"));
+        }
+
         $("input").attr("autocomplete","off");
         $("#tip1").val(
                 'beeline'+'\n'+'use szdsjsxm_sj;'+'\n'+'set hive.execution.engine=spark;'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
@@ -144,6 +154,11 @@
             // fq=fq==""? $("#fq").attr("placeholder"):fq;
             var px=$("#px").val();
             px=px==""? $("#px").attr("placeholder"):px;
+            if($("#me").val()!=""){
+                localStorage.setItem("me",me);
+            }else{
+                localStorage.removeItem("me");
+            }
 
 
             $("#result").val("create table szdsjsxm_sj."+me+"_"+date+"_"+order_no_last6+"_"+
@@ -190,7 +205,7 @@
             if(year%4==0&&year%100!=0||year%400==0){
                 febday=29
             }
-            $("#sql_tip4").text(
+            $("#tip4").text(
                 year+"01,"+year+"02,"+year+"03,"+year+"04,"+year+"05,"+year+"06,"+year+"07,"+year+"08,"+
                 year+"09,"+year+"10,"+year+"11,"+year+"12"+"\n"+
                 year+"0101,"+year+"02"+febday+","+year+"0331,"+year+"0430,"+year+"0531,"+year+"0630,"+year+"0731,"+
@@ -200,6 +215,12 @@
 
 
         });
+        $("#generate1").click();
+        $(".page1").keyup(function(){
+            $("#generate1").click();
+        });
+
+
         var ct =new copy_txt();  
         $("input").each(function(){
             var val=$(this).val();
@@ -232,6 +253,16 @@
         workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
         var appendix=$("#appendix").val();
         appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+        if($("#order_no2").val()!=""){
+            localStorage.setItem('order_no2',order_no);
+        }else{
+                localStorage.removeItem("order_no2");
+            }
+        if($("#operator").val()!=""){
+            localStorage.setItem('operator',operator);
+        }else{
+                localStorage.removeItem("operator");
+            }
         $("#huidan1").val(
             "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
         );
@@ -262,37 +293,32 @@
             <div class="col-sm-5">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">表名</span>
-                    <input id="tablename" type="text" class="form-control" placeholder="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ" aria-label="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ"
+                    <input id="tablename" type="text" class="form-control page1" placeholder="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ" aria-label="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ"
                     aria-describedby="basic-addon1">
                 </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon2">表别名</span>
-                    <input id="tablealias" type="text" class="form-control" placeholder="a" aria-label="a"
+                    <input id="tablealias" type="text" class="form-control page1" placeholder="a" aria-label="a"
                     aria-describedby="basic-addon2">
-                </div>
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon3">分区字段</span>
-                    <input id="fq" type="text" class="form-control" placeholder="" aria-label="" 
-                    aria-describedby="basic-addon3">
+                    <span class="input-group-text" id="basic-addon12">年份</span>
+                    <input id="year" type="text" class="form-control page1" placeholder="2021" aria-label="2021"
+                    aria-describedby="basic-addon12">
                 </div>
 
-                <div class="input-group mb-3">
+                <div class="input-group mb-3" >
+                    <span class="input-group-text" id="basic-addon3">分区字段</span>
+                    <input id="fq" type="text" class="form-control page1" placeholder="" aria-label="" 
+                    aria-describedby="basic-addon3">
                     <span class="input-group-text" id="basic-addon4">排序字段</span>
-                    <input id="px" type="text" class="form-control" placeholder="day desc" aria-label="day desc"
+                    <input id="px" type="text" class="form-control page1" placeholder="day desc" aria-label="day desc"
                     aria-describedby="basic-addon4">
                 </div>
 
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon10">查重字段</span>
-                    <input id="cc" type="text" class="form-control" placeholder="usr_nbr" aria-label="usr_nbr"
+                    <input id="cc" type="text" class="form-control page1" placeholder="usr_nbr" aria-label="usr_nbr"
                     aria-describedby="basic-addon10">
-                </div>
-
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon12">年份</span>
-                    <input id="year" type="text" class="form-control" placeholder="2021" aria-label="2021"
-                    aria-describedby="basic-addon12">
                 </div>
 
                 <div class="input-group mb-3">
@@ -310,20 +336,20 @@
                     <code id="sql_tip3" rows="12" class="form-control autocopy" aria-label="SQL"></code>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text">SQL</span>
-                    <code id="sql_tip4" rows="12" class="form-control" aria-label="SQL"></code>
+                    <span class="input-group-text">TIP</span>
+                    <code id="tip4" rows="12" class="form-control" aria-label="TIP"></code>
                 </div>
 
 
             </div>
             <div class="col-sm-7">
                 <div class="input-group mb-3">
-                    <input id="me" type="text" class="form-control" placeholder="lta" aria-label="lta"
+                    <input id="me" type="text" class="form-control page1" placeholder="lta" aria-label="lta"
                     aria-describedby="me">
                     <span class="input-group-text" id="me">名字</span>
                 </div>
                 <div class="input-group mb-3">
-                    <input id="order_no" type="text" class="form-control" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
+                    <input id="order_no" type="text" class="form-control page1" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
                     aria-describedby="basic-addon0">
                     <span class="input-group-text" id="basic-addon0">单号</span>
                 </div>
@@ -333,7 +359,7 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
-                    <textarea id="result" rows="3" class="form-control autocopy" aria-label="结果"></textarea>
+                    <textarea id="result" rows="6" class="form-control autocopy" aria-label="结果"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
@@ -341,7 +367,7 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip2" rows="2" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
@@ -362,8 +388,6 @@
                     <span class="input-group-text" id="basic-addon6">处理人</span>
                     <input id="operator" type="text" class="form-control" placeholder="Angle" aria-label="Angle"
                     aria-describedby="basic-addon6">
-                </div>
-                <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon7">工时(小时)</span>
                     <input id="workhours" type="text" class="form-control" placeholder="8" aria-label="8"
                     aria-describedby="basic-addon7">
