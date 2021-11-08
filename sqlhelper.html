@@ -175,7 +175,9 @@
                 "zip -re "+order_no+".zip"+"\n"+
                 "put "+order_no+".zip"+"\n"+
                 "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"+"\n"+
-                "chmod 777 ./"+order_no+".zip"
+                "chmod 777 ./"+order_no+".zip"+"\n"+
+                "文件已上传至/ftpdsjs/sz/tmp/"+order_no+".zip"+"\n"+
+                "密码："+order_no_last6
             );
             var partition_by=fq==""?fq:"partition by "+fq+" ";
             $("#sql_tip").text(
@@ -290,11 +292,11 @@
             <img class="logo" src="images/Logox.png" width="150px" alt="Logo">
             <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
             <button id="mytips" type="button" class="btn btn-outline-success">TIPS</button>
+            <button id="other" type="button" class="btn btn-outline-light">SQL</button>
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
             <button type="button" class="btn btn-outline-danger">Danger</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
             <button type="button" class="btn btn-outline-info">Info</button>
-            <button type="button" class="btn btn-outline-light">Light</button>
             <button type="button" class="btn btn-outline-dark">Dark</button> -->
         </div>
         <div id="helper" class="row">
@@ -363,7 +365,7 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">上传</span>
-                    <textarea  id="upload_tip" rows="5" class="form-control" aria-label="上传"></textarea>
+                    <textarea  id="upload_tip" rows="7" class="form-control" aria-label="上传"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
