@@ -60,11 +60,12 @@
         color: #97353d;
     }
     .m{
-        /* background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f393f0), to(#fdc3c3)) */
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#9bc9fd), to(#e6cb91))
         /* background:url("https://www.mickeyshannon.com/photos/zoom/dallas-divide-sunrise.jpg") no-repeat fixed; */
+        /* background:url("https://cn.bing.com/th?id=OHR.ChurchillBears_EN-CN7324366509_1920x1080.jpg&rf=LaDigue_1920x1080.jpg") no-repeat fixed; */
         /* background:url("https://www.celebritycruises.com/content/dam/celebrity/ports/apia-samoa-top-ports-80-opacity.jpg") no-repeat center fixed; */
         /* background:url("https://img.17sucai.com/upload/18693/2013-07-31/89d2029ffbff694503f7526b08262fca.png?x-oss-process=style/pri") no-repeat center fixed; */
-        background:url("https://www.beihaiting.com/uploads/allimg/150528/10723-15052QAZ4116.jpg") no-repeat ;
+        /* background:url("https://www.beihaiting.com/uploads/allimg/150528/10723-15052QAZ4116.jpg") no-repeat ; */
     }
     .trans{
         background-color: transparent;
@@ -146,8 +147,10 @@
                 $(this).select();
             });
         $("#generate1").click(function () {
-            $("#helper").show();
-            $("#alltips").addClass("hide");
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#helper").removeClass("hide");
             var date = new Date().format("yyyyMMdd");
             var me=$("#me").val();
             me=me==""? $("#me").attr("placeholder"):me;
@@ -245,14 +248,44 @@
             $(this).select();
             $(this).blur();
         });
-        $("#mytips").click(function () {
-            $("#helper").hide();
-            $("#alltips").removeClass("hide");
+        $("#btn_tip2").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page2").removeClass("hide");
             huidan();
         })
         $("#wod,#order_no2,#workhours,#appendix,#operator").keyup(huidan);
+        $("#btn_tip3").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page3").removeClass("hide");
+            sql2();
+        })
 
     });
+
+    function sql2(){
+        var page3_tbname=$("#page3_tbname").val();
+        page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+        var page3_condition=$("#page3_condition").val();
+        var page3_order=$("#page3_order").val();
+        var page3_rc=$("#page3_rc").val();
+        var page3_group=$("#page3_group").val();
+        var page3_tablealias=$("#page3_tablealias").val();
+        page3_tablealias=page3_tablealias==""? $("#page3_tablealias").attr("placeholder"):page3_tablealias;
+         $("#page3_sql1").val("select" + "\n" +
+                "    "+page3_tablealias+".*" +"\n" +
+                "from" + "\n" +
+                "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
+         $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
+         $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
+        
+                
+        
+    }
+
     function huidan(){
         var wod=$("#wod").val();
         var order_no=$("#order_no2").val();
@@ -291,15 +324,15 @@
         <div class="bd-example">
             <img class="logo" src="images/Logox.png" width="150px" alt="Logo">
             <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
-            <button id="mytips" type="button" class="btn btn-outline-success">TIPS</button>
-            <button id="other" type="button" class="btn btn-outline-light">SQL</button>
+            <button id="btn_tip2" type="button" class="btn btn-outline-success">TIPS</button>
+            <button id="btn_tip3" type="button" class="btn btn-outline-light">SQL</button>
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
             <button type="button" class="btn btn-outline-danger">Danger</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
             <button type="button" class="btn btn-outline-info">Info</button>
             <button type="button" class="btn btn-outline-dark">Dark</button> -->
         </div>
-        <div id="helper" class="row">
+        <div id="helper" class="row cc">
             <div class="col-sm-5">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">表名</span>
@@ -382,7 +415,7 @@
             </div>
         </div>
 
-        <div id="alltips" class="row hide">
+        <div id="page2" class="row cc">
             <div class="col-sm-6">
                 <div class="input-group mb-3">
                     <input id="order_no2" type="text" class="form-control" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
@@ -421,6 +454,62 @@
                 </div>
             </div>
             <div class="col-sm-6"></div>
+        </div>
+        <div id="page3" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon31">表名</span>
+                    <input id="page3_tbname" type="text" class="form-control" placeholder="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ" aria-label="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ"
+                    aria-describedby="basic-addon31">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon32">条件</span>
+                    <input id="page3_condition" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon32">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon33">排序</span>
+                    <input id="page3_order" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon33">
+                    <span class="input-group-text" id="basic-addon34">记录数</span>
+                    <input id="page3_rc" type="text" class="form-control" placeholder="10" aria-label="10"
+                    aria-describedby="basic-addon34">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon35">分组</span>
+                    <input id="page3_group" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon35">
+                    <span class="input-group-text" id="basic-addon36">别名</span>
+                    <input id="page3_tablealias" type="text" class="form-control" placeholder="a" aria-label="a"
+                    aria-describedby="basic-addon36">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">抽取10条数据</span>
+                    <textarea id="page3_sql1" rows="4" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">查表分区</span>
+                    <textarea id="page3_sql2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">查看表定义</span>
+                    <textarea id="page3_sql3" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="page3_sql4" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="page3_sql5" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="page3_sql6" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
         </div>
     </div>
 
