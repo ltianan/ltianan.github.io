@@ -202,7 +202,7 @@
                 "from" + "\n" +
                 "    "+tablename + " " + tablealias + "\n" +
                 "where" + "\n" +
-                "    month = 202109" + "\n" +
+                "    month = "+lastmonth + "\n" +
                 "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + 10 + ")" + "\n" +
                 "group by" + "\n" +
                 "    day;"
@@ -216,7 +216,7 @@
             $("#tip4").text(
                 year+"01,"+year+"02,"+year+"03,"+year+"04,"+year+"05,"+year+"06,"+year+"07,"+year+"08,"+
                 year+"09,"+year+"10,"+year+"11,"+year+"12"+"\n"+
-                year+"0101,"+year+"02"+febday+","+year+"0331,"+year+"0430,"+year+"0531,"+year+"0630,"+year+"0731,"+
+                year+"0131,"+year+"02"+febday+","+year+"0331,"+year+"0430,"+year+"0531,"+year+"0630,"+year+"0731,"+
                 year+"0831,"+year+"0930,"+year+"1031,"+year+"1130,"+year+"1231"
             );
 
