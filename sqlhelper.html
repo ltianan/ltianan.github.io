@@ -65,6 +65,7 @@
         /* background:url("https://cn.bing.com/th?id=OHR.ChurchillBears_EN-CN7324366509_1920x1080.jpg&rf=LaDigue_1920x1080.jpg") no-repeat fixed; */
         /* background:url("https://www.celebritycruises.com/content/dam/celebrity/ports/apia-samoa-top-ports-80-opacity.jpg") no-repeat center fixed; */
         /* background:url("https://img.17sucai.com/upload/18693/2013-07-31/89d2029ffbff694503f7526b08262fca.png?x-oss-process=style/pri") no-repeat center fixed; */
+        /* background:url("https://www.bing.com/th/id/ABT91DFB03A959A57F7AFA918B02EA3BECD506996CB303067EE35932D77EE7CE3D8?qlt=90&pid=InlineBlock") no-repeat ; */
         /* background:url("https://www.beihaiting.com/uploads/allimg/150528/10723-15052QAZ4116.jpg") no-repeat ; */
     }
     .trans{
@@ -198,6 +199,19 @@
             );
             var lastmonth=new Date(new Date().setMonth((new Date().getMonth()-1))).format("yyyyMM");
             console.log(lastmonth);
+            var month=lastmonth%100;
+            var lastday=30;
+            if(month==1||month==3||month==5||month==7||month==8||month==10||month==12){
+                lastday=31;
+            }
+            if(month==2){
+                lastday=28;
+                if(lastmonth/100%4==0&&lastmonth/100%100!=0||lastmonth/100%400==0){
+                    lastday=29
+                }
+            }
+            
+
             $("#sql_tip3").text(
                 "select" + "\n" +
                 "    day," + "\n" +
@@ -208,7 +222,7 @@
                 "    "+tablename + " " + tablealias + "\n" +
                 "where" + "\n" +
                 "    month = "+lastmonth + "\n" +
-                "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + 10 + ")" + "\n" +
+                "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + lastday + ")" + "\n" +
                 "group by" + "\n" +
                 "    day;"
             );
@@ -261,12 +275,13 @@
                 $(this).addClass("hide");
             });
             $("#page3").removeClass("hide");
-            sql2();
+            sql3();
         })
+        $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_tablealias,#page3_field_cnt,#page3_field_seperator,#page3_batch").keyup(sql3);
 
     });
 
-    function sql2(){
+    function sql3(){
         var page3_tbname=$("#page3_tbname").val();
         page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
         var page3_condition=$("#page3_condition").val();
@@ -275,13 +290,27 @@
         var page3_group=$("#page3_group").val();
         var page3_tablealias=$("#page3_tablealias").val();
         page3_tablealias=page3_tablealias==""? $("#page3_tablealias").attr("placeholder"):page3_tablealias;
-         $("#page3_sql1").val("select" + "\n" +
-                "    "+page3_tablealias+".*" +"\n" +
-                "from" + "\n" +
+         $("#page3_sql1").val("select\n" +
+                "    "+page3_tablealias+".*\n" +
+                "from\n" +
                 "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
          $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
          $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
-        
+         var page3_field_cnt=$("#page3_field_cnt").val();
+         page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
+         var page3_field_seperator=$("#page3_field_seperator").val();
+         page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
+         var page3_batch=$("#page3_batch").val();
+         page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
+         var field_info="";
+         for(var i=0;i<page3_field_cnt;i++){
+             if(i==0){
+                 field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr,\n";
+             }else{
+                field_info+="    trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i+",\n";
+             }
+         }
+         $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"from\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
                 
         
     }
@@ -459,7 +488,7 @@
             <div class="col-sm-6">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon31">表名</span>
-                    <input id="page3_tbname" type="text" class="form-control" placeholder="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ" aria-label="jcfw.TW_NET_ROAM_OUT_TRACE_D_SZ"
+                    <input id="page3_tbname" type="text" class="form-control" placeholder="lta_2021_ref" aria-label="lta_2021_ref"
                     aria-describedby="basic-addon31">
                 </div>
                 <div class="input-group mb-3">
@@ -498,8 +527,18 @@
             </div>
             <div class="col-sm-6">
                 <div class="input-group mb-3">
-                    <span class="input-group-text">TIP</span>
-                    <textarea id="page3_sql4" rows="5" class="form-control" aria-label="tips"></textarea>
+                <span class="input-group-text" id="basic-addon37">导入批次（分区）</span>
+                <input id="page3_batch" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon37">
+                <span class="input-group-text" id="basic-addon38">字段数</span>
+                <input id="page3_field_cnt" type="text" class="form-control" placeholder="5" aria-label="5"
+                    aria-describedby="basic-addon38">
+                <span class="input-group-text" id="basic-addon39">数据分隔符</span>
+                <input id="page3_field_seperator" type="text" class="form-control" placeholder="|" aria-label="|"
+                    aria-describedby="basic-addon39">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">生成维表</span>
+                    <textarea id="page3_sql4" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
