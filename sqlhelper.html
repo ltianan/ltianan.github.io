@@ -402,11 +402,13 @@
             }
 
             text2="'"+text2.replaceAll("\n","','");
-            if(text2.substr(text2.length-1,1)!="'"){
+            if(text2.substr(text2.length-1,1)!="'"){                
                 text2=text2+"'";
             }
             else if(text2.substr(text2.length-2,2)==",'"){
                 text2=text2.substr(0,text2.length-2);
+            }else if(text2=="'"){
+                text2="";
             }
             $("#page4_text2").val(text2);
 
