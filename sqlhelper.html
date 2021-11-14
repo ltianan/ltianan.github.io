@@ -39,16 +39,16 @@
     }
 
     ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-        color: red!important;
+        color:lightseagreen !important;
     }
     :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-        color: red!important;
+        color: lightseagreen !important;
     }
     ::-moz-placeholder { /* Mozilla Firefox 19+ */
-        color: red!important;
+        color: lightseagreen !important;
     }
     :-ms-input-placeholder { /* Internet Explorer 10-11 */
-        color: red!important;
+        color: lightseagreen !important;
     }
     .form-control{
         background-color: transparent;
@@ -67,6 +67,15 @@
         /* background:url("https://img.17sucai.com/upload/18693/2013-07-31/89d2029ffbff694503f7526b08262fca.png?x-oss-process=style/pri") no-repeat center fixed; */
         /* background:url("https://www.bing.com/th/id/ABT91DFB03A959A57F7AFA918B02EA3BECD506996CB303067EE35932D77EE7CE3D8?qlt=90&pid=InlineBlock") no-repeat ; */
         /* background:url("https://www.beihaiting.com/uploads/allimg/150528/10723-15052QAZ4116.jpg") no-repeat ; */
+    }
+    .r{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9b2b2), to(#e6cb91))
+    }
+    .g{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#91bd99), to(#e6cb91))
+    }
+    .w{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e1e1e1), to(#e6cb91))
     }
     .trans{
         background-color: transparent;
@@ -126,13 +135,19 @@
         }
     $(document).ready(function () {
         if(localStorage.getItem("order_no2")!=undefined){
-            $("#order_no2").val(localStorage.getItem("order_no2"));
+            $("#order_no2").val(localStorage.getItem("order_no"));
+        }
+        if(localStorage.getItem("order_no")!=undefined){
+            $("#order_no").val(localStorage.getItem("order_no"));
         }
         if(localStorage.getItem("operator")!=undefined){
             $("#operator").val(localStorage.getItem("operator"));
         }
         if(localStorage.getItem("me")!=undefined){
             $("#me").val(localStorage.getItem("me"));
+        }
+        if(localStorage.getItem("tablename")!=undefined){
+            $("#tablename").val(localStorage.getItem("tablename"));
         }
 
         $("input").attr("autocomplete","off");
@@ -147,7 +162,9 @@
             $("#order_no,#order_no2").click(function(){
                 $(this).select();
             });
-        $("#generate1").click(function () {
+        $("#btn_tip1").click(function () {
+            $('body').removeAttr('class');
+            $('body').addClass('m');
             $(".cc").each(function(){
                 $(this).addClass("hide");
             });
@@ -166,10 +183,20 @@
             // fq=fq==""? $("#fq").attr("placeholder"):fq;
             var px=$("#px").val();
             px=px==""? $("#px").attr("placeholder"):px;
+            if($("#tablename").val()!=""){
+                localStorage.setItem("tablename",tablename);
+            }else{
+                localStorage.removeItem("tablename");
+            }
             if($("#me").val()!=""){
                 localStorage.setItem("me",me);
             }else{
                 localStorage.removeItem("me");
+            }
+            if($("#order_no").val()!=""){
+                localStorage.setItem("order_no",order_no);
+            }else{
+                localStorage.removeItem("order_no");
             }
 
 
@@ -242,9 +269,9 @@
 
 
         });
-        $("#generate1").click();
+        $("#btn_tip1").click();
         $(".page1").keyup(function(){
-            $("#generate1").click();
+            $("#btn_tip1").click();
         });
 
 
@@ -277,11 +304,53 @@
             $("#page3").removeClass("hide");
             sql3();
         })
+        $("#btn_tip4").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page4").removeClass("hide");
+            sql4();
+        })
         $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_tablealias,#page3_field_cnt,#page3_field_seperator,#page3_batch").keyup(sql3);
 
     });
+    
+    function huidan(){
+        $('body').removeAttr('class');
+        $('body').addClass('g');
+        var wod=$("#wod").val();
+        var order_no=$("#order_no2").val();
+        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+        var operator=$("#operator").val();
+        operator=operator==""? $("#operator").attr("placeholder"):operator;
+        var workhours=$("#workhours").val();
+        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+        var appendix=$("#appendix").val();
+        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+        if($("#order_no2").val()!=""){
+            localStorage.setItem('order_no2',order_no);
+        }else{
+                localStorage.removeItem("order_no2");
+            }
+        if($("#operator").val()!=""){
+            localStorage.setItem('operator',operator);
+        }else{
+                localStorage.removeItem("operator");
+            }
+        $("#huidan1").val(
+            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan2").val(
+            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan3").val(
+            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+    }
 
     function sql3(){
+        $('body').removeAttr('class');
+        $('body').addClass('w');
         var page3_tbname=$("#page3_tbname").val();
         page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
         var page3_condition=$("#page3_condition").val();
@@ -314,37 +383,35 @@
                 
         
     }
+    
+    function sql4(){
+        $('body').removeAttr('class');
+        $('body').addClass('r');
+        var text=$("#page4_excel1").val();
+        var text2=$("#page4_excel1").val();
+        var filed_separator=["|",":", String.fromCharCode(29)];
+        for (var i = 0; i < filed_separator.length; i++) {
+            if(text.indexOf(filed_separator[i]) != -1){
+                continue;
+            }
+            text=text.replaceAll("\t",filed_separator[i]);
+            $("#page4_text1").val(text);
+            break;
+        }
 
-    function huidan(){
-        var wod=$("#wod").val();
-        var order_no=$("#order_no2").val();
-        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
-        var operator=$("#operator").val();
-        operator=operator==""? $("#operator").attr("placeholder"):operator;
-        var workhours=$("#workhours").val();
-        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
-        var appendix=$("#appendix").val();
-        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
-        if($("#order_no2").val()!=""){
-            localStorage.setItem('order_no2',order_no);
-        }else{
-                localStorage.removeItem("order_no2");
-            }
-        if($("#operator").val()!=""){
-            localStorage.setItem('operator',operator);
-        }else{
-                localStorage.removeItem("operator");
-            }
-        $("#huidan1").val(
-            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
-        $("#huidan2").val(
-            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
-        $("#huidan3").val(
-            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
+        text2="'"+text2.replaceAll("\n","','");
+        if(text2.substr(text2.length-1,1)!="'"){
+            text2=text2+"'";
+        }
+        else if(text2.substr(text2.length-2,2)==",'"){
+            text2=text2.substr(0,text2.length-2);
+        }
+        $("#page4_text2").val(text2);
+
     }
+
+
+
 
 </script>
 
@@ -352,11 +419,11 @@
     <div class="container">
         <div class="bd-example">
             <img class="logo" src="images/Logox.png" width="150px" alt="Logo">
-            <button id="generate1" type="button" class="btn btn-outline-primary">生成</button>
+            <button id="btn_tip1" type="button" class="btn btn-outline-primary">生成</button>
             <button id="btn_tip2" type="button" class="btn btn-outline-success">TIPS</button>
             <button id="btn_tip3" type="button" class="btn btn-outline-light">SQL</button>
+            <button id="btn_tip4" type="button" class="btn btn-outline-danger">Excel</button>
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
-            <button type="button" class="btn btn-outline-danger">Danger</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
             <button type="button" class="btn btn-outline-info">Info</button>
             <button type="button" class="btn btn-outline-dark">Dark</button> -->
@@ -431,11 +498,11 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
-                    <textarea id="result" rows="6" class="form-control autocopy" aria-label="结果"></textarea>
+                    <textarea id="result" rows="5" class="form-control autocopy" aria-label="结果"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip1" rows="6" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip1" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
@@ -547,6 +614,24 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
                     <textarea id="page3_sql6" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="page4" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">原始Excel</span>
+                    <textarea id="page4_excel1" rows="25" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">数据</span>
+                    <textarea id="page4_text1" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">数据</span>
+                    <textarea id="page4_text2" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
