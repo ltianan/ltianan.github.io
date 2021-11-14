@@ -389,6 +389,7 @@
         function sql4(){
             $('body').removeAttr('class');
             $('body').addClass('r');
+            $("#warningmessage").addClass("hide");
             var text=$("#page4_excel1").val();
             var text2=$("#page4_excel1").val();
             var filed_separator=["|",":", String.fromCharCode(29)];
@@ -399,6 +400,10 @@
                 text=text.replaceAll("\t",filed_separator[i]);
                 $("#page4_text1").val(text);
                 break;
+            }
+            if(text.indexOf("\"") != -1){
+                console.error("数据可能有异常，检查是否单元格包含换行符！");
+                $("#warningmessage").removeClass("hide");
             }
 
             text2="'"+text2.replaceAll("\n","','");
@@ -661,8 +666,11 @@
             </div>
             <div class="col-sm-6">
                 <div class="input-group mb-3">
-                    <span id="save" class="input-group-text">保存</span>
+                    <span id="save" class="input-group-text" style="text-decoration-line: underline;cursor:pointer">保存</span>
                     <textarea id="page4_text1" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div id="warningmessage" class="alert alert-warning hide">
+                    <strong>数据可能有异常，检查单元格是否包含换行符！</strong>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">数据</span>
