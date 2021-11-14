@@ -313,102 +313,135 @@
         })
         $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_tablealias,#page3_field_cnt,#page3_field_seperator,#page3_batch").keyup(sql3);
 
+        $("#save").click(saveTextAsFile);
+
     });
     
-    function huidan(){
-        $('body').removeAttr('class');
-        $('body').addClass('g');
-        var wod=$("#wod").val();
-        var order_no=$("#order_no2").val();
-        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
-        var operator=$("#operator").val();
-        operator=operator==""? $("#operator").attr("placeholder"):operator;
-        var workhours=$("#workhours").val();
-        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
-        var appendix=$("#appendix").val();
-        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
-        if($("#order_no2").val()!=""){
-            localStorage.setItem('order_no2',order_no);
-        }else{
-                localStorage.removeItem("order_no2");
-            }
-        if($("#operator").val()!=""){
-            localStorage.setItem('operator',operator);
-        }else{
-                localStorage.removeItem("operator");
-            }
-        $("#huidan1").val(
-            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
-        $("#huidan2").val(
-            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
-        $("#huidan3").val(
-            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-        );
-    }
+        function huidan(){
+            $('body').removeAttr('class');
+            $('body').addClass('g');
+            var wod=$("#wod").val();
+            var order_no=$("#order_no2").val();
+            order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+            var operator=$("#operator").val();
+            operator=operator==""? $("#operator").attr("placeholder"):operator;
+            var workhours=$("#workhours").val();
+            workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+            var appendix=$("#appendix").val();
+            appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+            if($("#order_no2").val()!=""){
+                localStorage.setItem('order_no2',order_no);
+            }else{
+                    localStorage.removeItem("order_no2");
+                }
+            if($("#operator").val()!=""){
+                localStorage.setItem('operator',operator);
+            }else{
+                    localStorage.removeItem("operator");
+                }
+            $("#huidan1").val(
+                "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+            $("#huidan2").val(
+                "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+            $("#huidan3").val(
+                "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+            );
+        }
 
-    function sql3(){
-        $('body').removeAttr('class');
-        $('body').addClass('w');
-        var page3_tbname=$("#page3_tbname").val();
-        page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
-        var page3_condition=$("#page3_condition").val();
-        var page3_order=$("#page3_order").val();
-        var page3_rc=$("#page3_rc").val();
-        var page3_group=$("#page3_group").val();
-        var page3_tablealias=$("#page3_tablealias").val();
-        page3_tablealias=page3_tablealias==""? $("#page3_tablealias").attr("placeholder"):page3_tablealias;
-         $("#page3_sql1").val("select\n" +
-                "    "+page3_tablealias+".*\n" +
-                "from\n" +
-                "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
-         $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
-         $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
-         var page3_field_cnt=$("#page3_field_cnt").val();
-         page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
-         var page3_field_seperator=$("#page3_field_seperator").val();
-         page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
-         var page3_batch=$("#page3_batch").val();
-         page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
-         var field_info="";
-         for(var i=0;i<page3_field_cnt;i++){
-             if(i==0){
-                 field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr,\n";
-             }else{
-                field_info+="    trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i+",\n";
-             }
-         }
-         $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"from\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
-                
-        
-    }
+        function sql3(){
+            $('body').removeAttr('class');
+            $('body').addClass('w');
+            var page3_tbname=$("#page3_tbname").val();
+            page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+            var page3_condition=$("#page3_condition").val();
+            var page3_order=$("#page3_order").val();
+            var page3_rc=$("#page3_rc").val();
+            var page3_group=$("#page3_group").val();
+            var page3_tablealias=$("#page3_tablealias").val();
+            page3_tablealias=page3_tablealias==""? $("#page3_tablealias").attr("placeholder"):page3_tablealias;
+            $("#page3_sql1").val("select\n" +
+                    "    "+page3_tablealias+".*\n" +
+                    "from\n" +
+                    "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
+            $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
+            $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
+            var page3_field_cnt=$("#page3_field_cnt").val();
+            page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
+            var page3_field_seperator=$("#page3_field_seperator").val();
+            page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
+            var page3_batch=$("#page3_batch").val();
+            page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
+            var field_info="";
+            for(var i=0;i<page3_field_cnt;i++){
+                if(i==0){
+                    field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr,\n";
+                }else{
+                    field_info+="    trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i+",\n";
+                }
+            }
+            $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"from\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
+                    
+            
+        }
     
-    function sql4(){
-        $('body').removeAttr('class');
-        $('body').addClass('r');
-        var text=$("#page4_excel1").val();
-        var text2=$("#page4_excel1").val();
-        var filed_separator=["|",":", String.fromCharCode(29)];
-        for (var i = 0; i < filed_separator.length; i++) {
-            if(text.indexOf(filed_separator[i]) != -1){
-                continue;
+        function sql4(){
+            $('body').removeAttr('class');
+            $('body').addClass('r');
+            var text=$("#page4_excel1").val();
+            var text2=$("#page4_excel1").val();
+            var filed_separator=["|",":", String.fromCharCode(29)];
+            for (var i = 0; i < filed_separator.length; i++) {
+                if(text.indexOf(filed_separator[i]) != -1){
+                    continue;
+                }
+                text=text.replaceAll("\t",filed_separator[i]);
+                $("#page4_text1").val(text);
+                break;
             }
-            text=text.replaceAll("\t",filed_separator[i]);
-            $("#page4_text1").val(text);
-            break;
+
+            text2="'"+text2.replaceAll("\n","','");
+            if(text2.substr(text2.length-1,1)!="'"){
+                text2=text2+"'";
+            }
+            else if(text2.substr(text2.length-2,2)==",'"){
+                text2=text2.substr(0,text2.length-2);
+            }
+            $("#page4_text2").val(text2);
+
         }
 
-        text2="'"+text2.replaceAll("\n","','");
-        if(text2.substr(text2.length-1,1)!="'"){
-            text2=text2+"'";
-        }
-        else if(text2.substr(text2.length-2,2)==",'"){
-            text2=text2.substr(0,text2.length-2);
-        }
-        $("#page4_text2").val(text2);
+        function saveTextAsFile() {
+            var textToWrite = $("#page4_text1").val();
+            var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+            var date = new Date().format("yyyyMMdd");
+            var me=$("#me").val();
+            me=me==""? $("#me").attr("placeholder"):me;
+            var order_no=$("#order_no").val();
+            order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
+            var order_no_last6=order_no.substring(order_no.length-6);
+            var filename=me+"_"+date+"_"+order_no_last6+"_"+"ref"
+            var fileNameToSaveAs = filename+".csv";
 
-    }
+            var downloadLink = document.createElement("a");
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "Download File";
+            if (window.webkitURL != null) {
+                // Chrome allows the link to be clicked without actually adding it to the DOM.
+                downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+            } else {
+                // Firefox requires the link to be added to the DOM before it can be clicked.
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = destroyClickedElement;
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+            }
+
+            downloadLink.click();
+        }
+
+        
 
 
 
@@ -626,7 +659,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="input-group mb-3">
-                    <span class="input-group-text">数据</span>
+                    <span id="save" class="input-group-text">保存</span>
                     <textarea id="page4_text1" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
