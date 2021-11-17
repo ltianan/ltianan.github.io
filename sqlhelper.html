@@ -251,7 +251,7 @@
                 "    month = "+lastmonth + "\n" +
                 "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + lastday + ")" + "\n" +
                 "group by" + "\n" +
-                "    day;"
+                "    day \norder by day asc;"
             );
             var year=$("#year").val();
             year=year==""? $("#year").attr("placeholder"):year;
@@ -365,6 +365,16 @@
                     "    "+page3_tablealias+".*\n" +
                     "from\n" +
                     "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
+            var fivedaysago=new Date(new Date().setDate((new Date().getDate()-5))).format("yyyyMMdd");
+            $("#page3_sql5").val("select\n" +
+                    "    "+page3_tablealias+".*\n" +
+                    "from\n" +
+                    "    "+page3_tbname + " " + page3_tablealias + " where day='"+fivedaysago+"' limit 10;" );
+            var twomonthago=new Date(new Date().setMonth((new Date().getMonth()-2))).format("yyyyMM");
+            $("#page3_sql6").val("select\n" +
+                    "    "+page3_tablealias+".*\n" +
+                    "from\n" +
+                    "    "+page3_tbname + " " + page3_tablealias + "  where month='"+twomonthago+"' limit 10;" );
             $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
             $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
             var page3_field_cnt=$("#page3_field_cnt").val();
@@ -624,23 +634,23 @@
                     <textarea id="page3_sql1" rows="4" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text">查表分区</span>
-                    <textarea id="page3_sql2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                    <span class="input-group-text">抽取5天前的10条数据</span>
+                    <textarea id="page3_sql5" rows="5" class="form-control" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text">查看表定义</span>
-                    <textarea id="page3_sql3" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                    <span class="input-group-text">抽取2个月前的10条数据</span>
+                    <textarea id="page3_sql6" rows="5" class="form-control" aria-label="tips"></textarea>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon37">导入批次（分区）</span>
-                <input id="page3_batch" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon37">
-                <span class="input-group-text" id="basic-addon38">字段数</span>
-                <input id="page3_field_cnt" type="text" class="form-control" placeholder="5" aria-label="5"
+                    <span class="input-group-text" id="basic-addon37">导入批次（分区）</span>
+                    <input id="page3_batch" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon37">
+                    <span class="input-group-text" id="basic-addon38">字段数</span>
+                    <input id="page3_field_cnt" type="text" class="form-control" placeholder="5" aria-label="5"
                     aria-describedby="basic-addon38">
-                <span class="input-group-text" id="basic-addon39">数据分隔符</span>
-                <input id="page3_field_seperator" type="text" class="form-control" placeholder="|" aria-label="|"
+                    <span class="input-group-text" id="basic-addon39">数据分隔符</span>
+                    <input id="page3_field_seperator" type="text" class="form-control" placeholder="|" aria-label="|"
                     aria-describedby="basic-addon39">
                 </div>
                 <div class="input-group mb-3">
@@ -648,12 +658,12 @@
                     <textarea id="page3_sql4" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text">TIP</span>
-                    <textarea id="page3_sql5" rows="5" class="form-control" aria-label="tips"></textarea>
+                    <span class="input-group-text">查表分区</span>
+                    <textarea id="page3_sql2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text">TIP</span>
-                    <textarea id="page3_sql6" rows="5" class="form-control" aria-label="tips"></textarea>
+                    <span class="input-group-text">查看表定义</span>
+                    <textarea id="page3_sql3" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
