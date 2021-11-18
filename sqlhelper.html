@@ -150,6 +150,24 @@
             $("#tablename").val(localStorage.getItem("tablename"));
         }
 
+        $("#btn-jcfw").change(function(){
+            var tablename=$("#page3_tbname").val();
+            if($("#btn-jcfw").is(':checked')){
+                if(tablename.substr(0,4)=="jcfw"){
+                }else{
+                    if(tablename!=undefined&&tablename!=""){
+                        tablename="jcfw."+tablename;
+                    }
+                }                
+            }else{
+                if(tablename.substr(0,4)=="jcfw"){
+                    tablename=tablename.substring(5);
+                }
+            }
+            $("#page3_tbname").val(tablename);
+            sql3();
+        });
+
         $("input").attr("autocomplete","off");
         $("#tip1").val(
                 'beeline'+'\n'+'use szdsjsxm_sj;'+'\n'+'set hive.execution.engine=spark;'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
@@ -355,6 +373,14 @@
             $('body').addClass('w');
             var page3_tbname=$("#page3_tbname").val();
             page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+            if($("#btn-jcfw").is(':checked')){
+                if(page3_tbname.substr(0,4)=="jcfw"){
+                }else{
+                    if(page3_tbname!=undefined&&page3_tbname!=""){
+                        page3_tbname="jcfw."+page3_tbname;
+                    }
+                }
+            }
             var page3_condition=$("#page3_condition").val();
             var page3_order=$("#page3_order").val();
             var page3_rc=$("#page3_rc").val();
@@ -607,6 +633,8 @@
                     <span class="input-group-text" id="basic-addon31">表名</span>
                     <input id="page3_tbname" type="text" class="form-control" placeholder="lta_2021_ref" aria-label="lta_2021_ref"
                     aria-describedby="basic-addon31">
+                    <input type="checkbox" class="btn-check" id="btn-jcfw" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-jcfw">jcfw</label><br>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon32">条件</span>
@@ -635,11 +663,11 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">抽取5天前的10条数据</span>
-                    <textarea id="page3_sql5" rows="5" class="form-control" aria-label="tips"></textarea>
+                    <textarea id="page3_sql5" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">抽取2个月前的10条数据</span>
-                    <textarea id="page3_sql6" rows="5" class="form-control" aria-label="tips"></textarea>
+                    <textarea id="page3_sql6" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
             <div class="col-sm-6">
