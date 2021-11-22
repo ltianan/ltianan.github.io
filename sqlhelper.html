@@ -329,7 +329,7 @@
             $("#page4").removeClass("hide");
             sql4();
         })
-        $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_tablealias,#page3_field_cnt,#page3_field_seperator,#page3_batch").keyup(sql3);
+        $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_field_cnt,#page3_field_seperator,#page3_batch,#page3_nbr").keyup(sql3);
 
         $("#save").click(saveTextAsFile);
 
@@ -385,8 +385,8 @@
             var page3_order=$("#page3_order").val();
             var page3_rc=$("#page3_rc").val();
             var page3_group=$("#page3_group").val();
-            var page3_tablealias=$("#page3_tablealias").val();
-            page3_tablealias=page3_tablealias==""? $("#page3_tablealias").attr("placeholder"):page3_tablealias;
+            var page3_nbr=$("#page3_nbr").val();
+            page3_tablealias="a";
             $("#page3_sql1").val("select\n" +
                     "    "+page3_tablealias+".*\n" +
                     "from\n" +
@@ -418,7 +418,29 @@
                 }
             }
             $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"from\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
-                    
+            
+            if(page3_nbr!=undefined && page3_nbr!=""){
+                var random_int=Math.round(Math.random()*1000);
+                var tmptb=page3_tbname+"_tmp_"+random_int;
+                var nbr_set="";  //'001,002'
+                nbr_set="'"+page3_nbr.replaceAll("\n","','");
+                if(nbr_set.substr(nbr_set.length-1,1)!="'"){                
+                    nbr_set=nbr_set+"'";
+                }
+                else if(nbr_set.substr(nbr_set.length-2,2)==",'"){
+                    nbr_set=nbr_set.substr(0,nbr_set.length-2);
+                }else if(nbr_set=="'"){
+                    nbr_set="";
+                }
+                nbr_set=nbr_set.replaceAll("','",",");
+                var ist_sql="drop table if exists "+tmptb+";\n"
+                +"create table "+tmptb+" as \nselect \n"+nbr_set+" nbr_set from dual;\n"+
+                "create table "+page3_tbname+" \nas \nselect distinct usr_nbr \nfrom "+tmptb+" \nlateral view explode(split(nbr_set, ',')) num as usr_nbr;\n"+
+                "drop table if exists "+tmptb+";\n";
+                $('#page3_ist_sql').val(ist_sql);
+            }else{
+                $('#page3_ist_sql').val("");
+            }
             
         }
     
@@ -636,7 +658,7 @@
                     <input type="checkbox" class="btn-check" id="btn-jcfw" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-jcfw">jcfw</label><br>
                 </div>
-                <div class="input-group mb-3">
+<!--                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon32">条件</span>
                     <input id="page3_condition" type="text" class="form-control" placeholder="" aria-label=""
                     aria-describedby="basic-addon32">
@@ -656,7 +678,7 @@
                     <span class="input-group-text" id="basic-addon36">别名</span>
                     <input id="page3_tablealias" type="text" class="form-control" placeholder="a" aria-label="a"
                     aria-describedby="basic-addon36">
-                </div>
+                </div> -->
                 <div class="input-group mb-3">
                     <span class="input-group-text">抽取10条数据</span>
                     <textarea id="page3_sql1" rows="4" class="form-control autocopy" aria-label="tips"></textarea>
@@ -668,6 +690,10 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text">抽取2个月前的10条数据</span>
                     <textarea id="page3_sql6" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">待导入号码</span>
+                    <textarea id="page3_nbr" rows="5" class="form-control" aria-label="tips"></textarea>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -692,6 +718,10 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text">查看表定义</span>
                     <textarea id="page3_sql3" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">插入语句</span>
+                    <textarea id="page3_ist_sql" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
