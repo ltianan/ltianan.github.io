@@ -412,12 +412,12 @@
             var field_info="";
             for(var i=0;i<page3_field_cnt;i++){
                 if(i==0){
-                    field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr,\n";
+                    field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr";
                 }else{
-                    field_info+="    trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i+",\n";
+                    field_info+="\n    ,trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i;
                 }
             }
-            $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"from\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
+            $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"\nfrom\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
             
             if(page3_nbr!=undefined && page3_nbr!=""){
                 var random_int=Math.round(Math.random()*1000);
