@@ -168,7 +168,7 @@
 
         $("input").attr("autocomplete","off");
         $("#tip1").val(
-                'beeline'+'\n'+'use szdsjsxm_sj;'+'\n'+'set hive.execution.engine=spark;'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
+                '-- show tables'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
 
             );
         $("#tip2").val(
@@ -598,11 +598,11 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip1" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip1" rows="3" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip2" rows="2" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip2" rows="3" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
