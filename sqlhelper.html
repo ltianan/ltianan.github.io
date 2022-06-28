@@ -494,8 +494,8 @@
             $('body').removeAttr('class');
             $('body').addClass('y');
             var txt=$("#page5_excel1").val();
-            var patt1=/(from|into|join|table)[ \n]+([^ ()\n;)]+)/igm;
-            var patt2=/create[ \n]+table[ \n]+([^ ()\n;)]+)/igm;
+            var patt1=/(from|into|join|table?! if )[ \n\t]+([^ ()\n\t;)]+)/igm;
+            var patt2=/create[ \n]+table[ \n\t]+([^ ()\n\t;)]+)/igm;
             var arr =txt.match(patt1);
             var arr2=txt.match(patt2);
             var result1="";    
@@ -820,7 +820,7 @@
                     <textarea id="page5_text1" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text" style="text-decoration-line: underline;cursor:pointer">临时表名</span>
+                    <span class="input-group-text">临时表名</span>
                     <textarea id="page5_text2" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
