@@ -494,7 +494,7 @@
             $('body').removeAttr('class');
             $('body').addClass('y');
             var txt=$("#page5_excel1").val();
-            var patt1=/(from|into|join|table?! if )[ \n\t]+([^ ()\n\t;)]+)/igm;
+            var patt1=/(from|into|join|table|exists)[ \n\t]+(?!if)([^ ()\n\t;)]+)/igm;
             var patt2=/create[ \n]+table[ \n\t]+([^ ()\n\t;)]+)/igm;
             var arr =txt.match(patt1);
             var arr2=txt.match(patt2);
