@@ -69,6 +69,9 @@
     .r{
         background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c9b2b2), to(#e6cb91))
     }
+    .y{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#d5bd80), to(#e6cb91))
+    }
     .g{
         background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#91bd99), to(#e6cb91))
     }
@@ -327,6 +330,18 @@
             $("#page4").removeClass("hide");
             sql4();
         })
+        $("#btn_tip5").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page5").removeClass("hide");
+            myregexp();
+        })
+        $("#getTbName").click(function () {
+            myregexp();
+        })
+
+
         $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_field_cnt,#page3_field_seperator,#page3_batch,#page3_nbr").keyup(sql3);
 
         $("#save").click(saveTextAsFile);
@@ -475,6 +490,52 @@
 
         }
 
+        function myregexp(){
+            $('body').removeAttr('class');
+            $('body').addClass('y');
+            var txt=$("#page5_excel1").val();
+            var patt1=/(from|into|join|table)[ \n]+([^ ()\n;)]+)/igm;
+            var patt2=/create[ \n]+table[ \n]+([^ ()\n;)]+)/igm;
+            var arr =txt.match(patt1);
+            var arr2=txt.match(patt2);
+            var result1="";    
+            var res1="";
+            var result2="";    
+            var res2="";
+            var tables=[];
+            while(res1 = patt1.exec(txt)) {   
+                var tableName=res1[2].toUpperCase()+"\n";
+                tables.push(tableName);
+            } 
+            var tables2=[];
+            while(res2 = patt2.exec(txt)) {   
+                var tableName2=res2[1].toUpperCase()+"\n";
+                tables2.push(tableName2);
+            } 
+            tables=qc(tables).sort();
+            tables2=qc(tables2).sort();
+
+            for (var i = 0; i < tables.length ; i++) {
+                result1=result1+tables[i];
+            }
+            for (var i = 0; i < tables2.length ; i++) {
+                result2=result2+tables2[i];
+            }
+            $("#page5_text1").val(result1); 
+            $("#page5_text2").val(result2); 
+
+        }
+
+        function qc(arr) {   // 数组去重
+            var newsArr = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (newsArr.indexOf(arr[i]) === -1) {
+                    newsArr.push(arr[i]);
+                }
+            }
+            return newsArr;
+        }
+
         function saveTextAsFile() {
             var textToWrite = $("#page4_text1").val();
             var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
@@ -519,6 +580,8 @@
             <button id="btn_tip2" type="button" class="btn btn-outline-success">TIPS</button>
             <button id="btn_tip3" type="button" class="btn btn-outline-light">SQL</button>
             <button id="btn_tip4" type="button" class="btn btn-outline-danger">Excel</button>
+            <button id="btn_tip5" type="button" class="btn btn-outline-warning">RegExp</button>
+            
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
             <button type="button" class="btn btn-outline-info">Info</button>
@@ -594,15 +657,15 @@
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">结果</span>
-                    <textarea id="result" rows="5" class="form-control autocopy" aria-label="结果"></textarea>
+                    <textarea id="result" rows="6" class="form-control autocopy" aria-label="结果"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip1" rows="3" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip1" rows="4" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">TIP</span>
-                    <textarea id="tip2" rows="3" class="form-control autocopy" aria-label="tips"></textarea>
+                    <textarea id="tip2" rows="2" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
@@ -741,6 +804,24 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text">数据</span>
                     <textarea id="page4_text2" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="page5" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">原始SQL</span>
+                    <textarea id="page5_excel1" rows="25" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span id="getTbName" class="input-group-text" style="text-decoration-line: underline;cursor:pointer">表名</span>
+                    <textarea id="page5_text1" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" style="text-decoration-line: underline;cursor:pointer">临时表名</span>
+                    <textarea id="page5_text2" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
                 </div>
             </div>
         </div>
