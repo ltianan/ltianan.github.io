@@ -508,23 +508,48 @@
                 tables.push(tableName);
             } 
             var tables2=[];
+            var tables3=[];
             while(res2 = patt2.exec(txt)) {   
                 var tableName2=res2[1]+"\n";
                 tables2.push(tableName2);
+                tables3.remove(tableName2);
             } 
             tables=qc(tables).sort();
             tables2=qc(tables2).sort();
+            tables3=tables;
+            
+            var result3="";
 
             for (var i = 0; i < tables.length ; i++) {
                 result1=result1+tables[i];
             }
             for (var i = 0; i < tables2.length ; i++) {
-                result2=result2+tables2[i];
+                result2=result2+tables2[i]; 
+                tables3.remove(tables2[i]);               
             }
-            $("#page5_text1").val(result1); 
+            for (var i = 0; i < tables3.length ; i++) {
+                if(tables3[i].length>=3)
+                result3=result3+tables3[i];                
+            }
+
+            $("#page5_text1").val(result3); 
             $("#page5_text2").val(result2); 
 
         }
+
+        Array.prototype.indexOf = function (val) {
+            for (var i = 0; i < this.length; i++) {
+                if (this[i] == val) return i;
+            }
+            return -1;
+        }; 
+
+        Array.prototype.remove = function (val) {
+            var index = this.indexOf(val);
+            if (index > -1) {
+                this.splice(index, 1);
+            }
+        };
 
         function qc(arr) {   // 数组去重
             var newsArr = [];
