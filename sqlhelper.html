@@ -504,13 +504,13 @@
             var res2="";
             var tables=[];
             while(res1 = patt1.exec(txt)) {   
-                var tableName=res1[2]+"\n";
+                var tableName=res1[2].toUpperCase()+"\n";
                 tables.push(tableName);
             } 
             var tables2=[];
             var tables3=[];
             while(res2 = patt2.exec(txt)) {   
-                var tableName2=res2[1]+"\n";
+                var tableName2=res2[1].toUpperCase()+"\n";
                 tables2.push(tableName2);
                 tables3.remove(tableName2);
             } 
