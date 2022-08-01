@@ -172,7 +172,15 @@
         $("input").attr("autocomplete","off");
         $("#tip1").val(
                 '-- show tables'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
+                +'set hive.exec.parallel.thread.number=16; -- 同一个sql允许并行任务的最大线程数'+'\n'
 
+                +'set hive.auto.convert.join = true; -- 是否自动转换为mapjoin'+'\n'
+                +'set hive.mapjoin.smalltable.filesize=50000000; -- 小表的最大文件大小，默认为25000000，即25M'+'\n'
+                +'set hive.auto.convert.join.noconditionaltask.size = 10000000; '+'\n'
+
+                +'set hive.fetch.task.conversion=more; -- 让可以不走mapreduce任务的，就不走mapreduce任务'+'\n'
+                +'set hive.map.aggr=true;              -- map端聚合，降低传给reduce的数据量'+'\n'
+                +'/*DTS_AB_202205241_2002669560*/'+'\n'
             );
         $("#tip2").val(
                 'spark-beeline\n'
