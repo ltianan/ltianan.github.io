@@ -150,6 +150,18 @@
         if(localStorage.getItem("tablename")!=undefined){
             $("#tablename").val(localStorage.getItem("tablename"));
         }
+        if(localStorage.getItem("page3_odrno")!=undefined){
+            $("#page3_odrno").val(localStorage.getItem("page3_odrno"));
+        }
+
+        $("#page3_odrno").blur(function(){
+            if($("#page3_odrno").val()!=""){
+                localStorage.setItem("page3_odrno",$("#page3_odrno").val());
+            }else{
+                localStorage.removeItem("page3_odrno");
+            }
+        });
+
 
         $("#btn-jcfw").change(function(){
             var tablename=$("#page3_tbname").val();
@@ -350,7 +362,7 @@
         })
 
 
-        $("#page3_tbname,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_field_cnt,#page3_field_seperator,#page3_batch,#page3_nbr").keyup(sql3);
+        $("#page3_tbname,#page3_odrno,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_field_cnt,#page3_field_seperator,#page3_batch,#page3_nbr").keyup(sql3);
 
         $("#save").click(saveTextAsFile);
 
@@ -394,6 +406,7 @@
             $('body').addClass('w');
             var page3_tbname=$("#page3_tbname").val();
             page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+            var page3_odrno=$("#page3_odrno").val();
             if($("#btn-jcfw").is(':checked')){
                 if(page3_tbname.substr(0,4)=="jcfw"){
                 }else{
@@ -408,17 +421,17 @@
             var page3_group=$("#page3_group").val();
             var page3_nbr=$("#page3_nbr").val();
             page3_tablealias="a";
-            $("#page3_sql1").val("select\n" +
+            $("#page3_sql1").val("select --"+page3_odrno+"\n"+
                     "    "+page3_tablealias+".*\n" +
                     "from\n" +
                     "    "+page3_tbname + " " + page3_tablealias + " limit 10;" );
             var fivedaysago=new Date(new Date().setDate((new Date().getDate()-5))).format("yyyyMMdd");
-            $("#page3_sql5").val("select\n" +
+            $("#page3_sql5").val("select --"+page3_odrno+"\n"+
                     "    "+page3_tablealias+".*\n" +
                     "from\n" +
                     "    "+page3_tbname + " " + page3_tablealias + " where day='"+fivedaysago+"' limit 10;" );
             var twomonthago=new Date(new Date().setMonth((new Date().getMonth()-2))).format("yyyyMM");
-            $("#page3_sql6").val("select\n" +
+            $("#page3_sql6").val("select --"+page3_odrno+"\n"+
                     "    "+page3_tablealias+".*\n" +
                     "from\n" +
                     "    "+page3_tbname + " " + page3_tablealias + "  where month='"+twomonthago+"' limit 10;" );
@@ -748,6 +761,10 @@
                     <span class="input-group-text" id="basic-addon31">表名</span>
                     <input id="page3_tbname" type="text" class="form-control" placeholder="lta_2021_ref" aria-label="lta_2021_ref"
                     aria-describedby="basic-addon31">
+                    <span class="input-group-text" id="basic-addon32">单号</span>
+                    <input id="page3_odrno" type="text" class="form-control" placeholder="/*DTS_AB_202205241_2002669560*/" aria-label="/*DTS_AB_202205241_2002669560*/"
+                    aria-describedby="basic-addon32">
+                    
                     <input type="checkbox" class="btn-check" id="btn-jcfw" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-jcfw">jcfw</label><br>
                 </div>
