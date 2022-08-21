@@ -204,6 +204,12 @@
             $("#order_no,#order_no2").click(function(){
                 $(this).select();
             });
+
+        $("#addClipBoardBtn").click(function(){
+            var content=$("#page6_content").val();
+            addClipBoardInfo(content);
+        })
+
         $("#btn_tip1").click(function () {
             $('body').removeAttr('class');
             $('body').addClass('m');
@@ -378,299 +384,319 @@
 
     });
     
-        function huidan(){
-            $('body').removeAttr('class');
-            $('body').addClass('g');
-            var wod=$("#wod").val();
-            var order_no=$("#order_no2").val();
-            order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
-            var operator=$("#operator").val();
-            operator=operator==""? $("#operator").attr("placeholder"):operator;
-            var workhours=$("#workhours").val();
-            workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
-            var appendix=$("#appendix").val();
-            appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
-            if($("#order_no2").val()!=""){
-                localStorage.setItem('order_no2',order_no);
+    function huidan(){
+        $('body').removeAttr('class');
+        $('body').addClass('g');
+        var wod=$("#wod").val();
+        var order_no=$("#order_no2").val();
+        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+        var operator=$("#operator").val();
+        operator=operator==""? $("#operator").attr("placeholder"):operator;
+        var workhours=$("#workhours").val();
+        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+        var appendix=$("#appendix").val();
+        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+        if($("#order_no2").val()!=""){
+            localStorage.setItem('order_no2',order_no);
+        }else{
+                localStorage.removeItem("order_no2");
+            }
+        if($("#operator").val()!=""){
+            localStorage.setItem('operator',operator);
+        }else{
+                localStorage.removeItem("operator");
+            }
+        $("#huidan1").val(
+            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan2").val(
+            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan3").val(
+            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+    }
+
+    function sql3(){
+        $('body').removeAttr('class');
+        $('body').addClass('w');
+        var page3_tbname=$("#page3_tbname").val();
+        page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+        var page3_odrno=$("#page3_odrno").val();
+        if($("#btn-jcfw").is(':checked')){
+            if(page3_tbname.substr(0,4)=="jcfw"){
             }else{
-                    localStorage.removeItem("order_no2");
+                if(page3_tbname!=undefined&&page3_tbname!=""){
+                    page3_tbname="jcfw."+page3_tbname;
                 }
-            if($("#operator").val()!=""){
-                localStorage.setItem('operator',operator);
+            }
+        }
+        var page3_condition=$("#page3_condition").val();
+        var page3_order=$("#page3_order").val();
+        var page3_rc=$("#page3_rc").val();
+        var page3_group=$("#page3_group").val();
+        var page3_nbr=$("#page3_nbr").val();
+        page3_tablealias="a";
+        var SQL1=generateSQL(page3_odrno,page3_tbname,'a','10',null,null);
+        $("#page3_sql1").val(SQL1);
+        var fivedaysago=new Date(new Date().setDate((new Date().getDate()-5))).format("yyyyMMdd");
+        var SQL5=generateSQL(page3_odrno,page3_tbname,'a','10','day',fivedaysago);
+        $("#page3_sql5").val(SQL5);
+        var twomonthago=new Date(new Date().setMonth((new Date().getMonth()-2))).format("yyyyMM");
+        var SQL6=generateSQL(page3_odrno,page3_tbname,'a','10','month',twomonthago);
+        $("#page3_sql6").val(SQL6);
+        $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
+        $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
+        var page3_field_cnt=$("#page3_field_cnt").val();
+        page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
+        var page3_field_seperator=$("#page3_field_seperator").val();
+        page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
+        var page3_batch=$("#page3_batch").val();
+        page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
+        var field_info="";
+        for(var i=0;i<page3_field_cnt;i++){
+            if(i==0){
+                field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr";
             }else{
-                    localStorage.removeItem("operator");
-                }
-            $("#huidan1").val(
-                "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
-            $("#huidan2").val(
-                "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
-            $("#huidan3").val(
-                "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
-            );
+                field_info+="\n    ,trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i;
+            }
         }
-
-        function sql3(){
-            $('body').removeAttr('class');
-            $('body').addClass('w');
-            var page3_tbname=$("#page3_tbname").val();
-            page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
-            var page3_odrno=$("#page3_odrno").val();
-            if($("#btn-jcfw").is(':checked')){
-                if(page3_tbname.substr(0,4)=="jcfw"){
-                }else{
-                    if(page3_tbname!=undefined&&page3_tbname!=""){
-                        page3_tbname="jcfw."+page3_tbname;
-                    }
-                }
-            }
-            var page3_condition=$("#page3_condition").val();
-            var page3_order=$("#page3_order").val();
-            var page3_rc=$("#page3_rc").val();
-            var page3_group=$("#page3_group").val();
-            var page3_nbr=$("#page3_nbr").val();
-            page3_tablealias="a";
-            var SQL1=generateSQL(page3_odrno,page3_tbname,'a','10',null,null);
-            $("#page3_sql1").val(SQL1);
-            var fivedaysago=new Date(new Date().setDate((new Date().getDate()-5))).format("yyyyMMdd");
-            var SQL5=generateSQL(page3_odrno,page3_tbname,'a','10','day',fivedaysago);
-            $("#page3_sql5").val(SQL5);
-            var twomonthago=new Date(new Date().setMonth((new Date().getMonth()-2))).format("yyyyMM");
-            var SQL6=generateSQL(page3_odrno,page3_tbname,'a','10','month',twomonthago);
-            $("#page3_sql6").val(SQL6);
-            $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
-            $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
-            var page3_field_cnt=$("#page3_field_cnt").val();
-            page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
-            var page3_field_seperator=$("#page3_field_seperator").val();
-            page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
-            var page3_batch=$("#page3_batch").val();
-            page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
-            var field_info="";
-            for(var i=0;i<page3_field_cnt;i++){
-                if(i==0){
-                    field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr";
-                }else{
-                    field_info+="\n    ,trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i;
-                }
-            }
-            $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"\nfrom\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
-            
-            if(page3_nbr!=undefined && page3_nbr!=""){
-                //左侧批量生成查询语句
-                var tableNames=page3_nbr.split("\n");
-                var sql11="";
-                var sql55="";
-                var sql66="";
-                $.each(tableNames,function(i,tableNamei){
-                    tableNamei=tableNamei.trim();
-                    sql11=sql11+generateSQL(page3_odrno,tableNamei,'a','10',null,null).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
-                    sql55=sql55+generateSQL(page3_odrno,tableNamei,'a','10','day',fivedaysago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
-                    sql66=sql66+generateSQL(page3_odrno,tableNamei,'a','10','month',twomonthago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
-                });
-                $("#page3_sql1").val(sql11);
-                $("#page3_sql5").val(sql55);
-                $("#page3_sql6").val(sql66);
-
-
-
-
-
-                //右侧插入单字段语句
-                var random_int=Math.round(Math.random()*1000);
-                var tmptb=page3_tbname+"_tmp_"+random_int;
-                var nbr_set="";  //'001,002'
-                nbr_set="'"+page3_nbr.replaceAll("\n","','");
-                if(nbr_set.substr(nbr_set.length-1,1)!="'"){                
-                    nbr_set=nbr_set+"'";
-                }
-                else if(nbr_set.substr(nbr_set.length-2,2)==",'"){
-                    nbr_set=nbr_set.substr(0,nbr_set.length-2);
-                }else if(nbr_set=="'"){
-                    nbr_set="";
-                }
-                nbr_set=nbr_set.replaceAll("','",",");
-                var ist_sql="drop table if exists "+tmptb+";\n"
-                +"create table "+tmptb+" as \nselect \n"+nbr_set+" nbr_set from dual;\n"+
-                "create table "+page3_tbname+" \nas \nselect distinct usr_nbr \nfrom "+tmptb+" \nlateral view explode(split(nbr_set, ',')) num as usr_nbr;\n"+
-                "drop table if exists "+tmptb+";\n";
-                $('#page3_ist_sql').val(ist_sql);
-            }else{
-                $('#page3_ist_sql').val("");
-            }
-            
-        }
-
-
-        /**
-         * @description: 根据参数返回查询SQL
-         * @param  orderNo         单号
-         * @param  tableName       表名
-         * @param  tableAlias      别名
-         * @param  limitCnt        记录数
-         * @param  conditionField  条件字段
-         * @param  conditionVal    条件值
-         * @return                 返回查询SQL
-         */            
-        function generateSQL(orderNo,tableName,tableAlias,limitCnt,conditionField,conditionVal){
-            if(orderNo!=undefined&&orderNo!=""){
-                orderNo="/*"+orderNo+"*/ ";
-            }
-            var sqlStr="select "+orderNo+"\n"+
-                    "    "+tableAlias+".*\n" +
-                    "from \n" +
-                    "    "+tableName + " " + tableAlias 
-            if(conditionField!=undefined){
-                sqlStr=sqlStr+" where "+conditionField+"='"+conditionVal+"'";
-            }
-            sqlStr=sqlStr+ " limit "+limitCnt+";" 
-            return sqlStr;
-        }
-
-    
-        function excel(){
-            $('body').removeAttr('class');
-            $('body').addClass('r');
-            $("#warningmessage").addClass("hide");
-            var text=$("#page4_excel1").val();
-            var text2=$("#page4_excel1").val();
-            var filed_separator=["|",":", String.fromCharCode(29)];
-            for (var i = 0; i < filed_separator.length; i++) {
-                if(text.indexOf(filed_separator[i]) != -1){
-                    continue;
-                }
-                text=text.replaceAll("\t",filed_separator[i]);
-                $("#page4_text1").val(text);
-                break;
-            }
-            if(text.indexOf("\"") != -1){
-                console.error("数据可能有异常，检查是否单元格包含换行符！");
-                $("#warningmessage").removeClass("hide");
-            }
-
-            text2="'"+text2.replaceAll("\n","','");
-            if(text2.substr(text2.length-1,1)!="'"){                
-                text2=text2+"'";
-            }
-            else if(text2.substr(text2.length-2,2)==",'"){
-                text2=text2.substr(0,text2.length-2);
-            }else if(text2=="'"){
-                text2="";
-            }
-            $("#page4_text2").val(text2);
-
-        }
-
-        function myregexp(){
-            $('body').removeAttr('class');
-            $('body').addClass('y');
-            var txt=$("#page5_excel1").val();
-            var patt1=/(from|into|join|table|exists)[ \n\t]+(?!if)([^ ()"\n\t;)]+)/igm;
-            var patt2=/create[ \n]+table[ \n\t]+([^ ()"\n\t;)]+)/igm;
-            var arr =txt.match(patt1);
-            var arr2=txt.match(patt2);
-            var result1="";    
-            var res1="";
-            var result2="";    
-            var res2="";
-            var tables=[];
-            while(res1 = patt1.exec(txt)) {   
-                var tableName=res1[2].toUpperCase()+"\n";
-                tables.push(tableName);
-            } 
-            var tables2=[];
-            var tables3=[];
-            while(res2 = patt2.exec(txt)) {   
-                var tableName2=res2[1].toUpperCase()+"\n";
-                tables2.push(tableName2);
-                tables3.remove(tableName2);
-            } 
-            tables=qc(tables).sort();
-            tables2=qc(tables2).sort();
-            tables3=tables;
-            
-            var result3="";
-
-            for (var i = 0; i < tables.length ; i++) {
-                result1=result1+tables[i];
-            }
-            for (var i = 0; i < tables2.length ; i++) {
-                result2=result2+tables2[i]; 
-                tables3.remove(tables2[i]);               
-            }
-            for (var i = 0; i < tables3.length ; i++) {
-                if(tables3[i].length>=3)
-                result3=result3+tables3[i];                
-            }
-
-            $("#page5_text1").val(result3); 
-            $("#page5_text2").val(result2); 
-
-        }
-
-        function clipboard(){
-            $('body').removeAttr('class');
-            $('body').addClass('b');
-        }
-
-        Array.prototype.indexOf = function (val) {
-            for (var i = 0; i < this.length; i++) {
-                if (this[i] == val) return i;
-            }
-            return -1;
-        }; 
-
-        Array.prototype.remove = function (val) {
-            var index = this.indexOf(val);
-            if (index > -1) {
-                this.splice(index, 1);
-            }
-        };
-
-        function qc(arr) {   // 数组去重
-            var newsArr = [];
-            for (var i = 0; i < arr.length; i++) {
-                if (newsArr.indexOf(arr[i]) === -1) {
-                    newsArr.push(arr[i]);
-                }
-            }
-            return newsArr;
-        }
-
-        function saveTextAsFile() {
-            var textToWrite = $("#page4_text1").val();
-            var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
-            var date = new Date().format("yyyyMMdd");
-            var me=$("#me").val();
-            me=me==""? $("#me").attr("placeholder"):me;
-            var order_no=$("#order_no").val();
-            order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
-            var order_no_last6=order_no.substring(order_no.length-6);
-            var filename=me+"_"+date+"_"+order_no_last6+"_"+"ref"
-            var fileNameToSaveAs = filename+".csv";
-
-            var downloadLink = document.createElement("a");
-            downloadLink.download = fileNameToSaveAs;
-            downloadLink.innerHTML = "Download File";
-            if (window.webkitURL != null) {
-                // Chrome allows the link to be clicked without actually adding it to the DOM.
-                downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
-            } else {
-                // Firefox requires the link to be added to the DOM before it can be clicked.
-                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-                downloadLink.onclick = destroyClickedElement;
-                downloadLink.style.display = "none";
-                document.body.appendChild(downloadLink);
-            }
-
-            downloadLink.click();
-        }
-
+        $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"\nfrom\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
         
+        if(page3_nbr!=undefined && page3_nbr!=""){
+            //左侧批量生成查询语句
+            var tableNames=page3_nbr.split("\n");
+            var sql11="";
+            var sql55="";
+            var sql66="";
+            $.each(tableNames,function(i,tableNamei){
+                tableNamei=tableNamei.trim();
+                sql11=sql11+generateSQL(page3_odrno,tableNamei,'a','10',null,null).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+                sql55=sql55+generateSQL(page3_odrno,tableNamei,'a','10','day',fivedaysago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+                sql66=sql66+generateSQL(page3_odrno,tableNamei,'a','10','month',twomonthago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+            });
+            $("#page3_sql1").val(sql11);
+            $("#page3_sql5").val(sql55);
+            $("#page3_sql6").val(sql66);
 
 
 
+
+
+            //右侧插入单字段语句
+            var random_int=Math.round(Math.random()*1000);
+            var tmptb=page3_tbname+"_tmp_"+random_int;
+            var nbr_set="";  //'001,002'
+            nbr_set="'"+page3_nbr.replaceAll("\n","','");
+            if(nbr_set.substr(nbr_set.length-1,1)!="'"){                
+                nbr_set=nbr_set+"'";
+            }
+            else if(nbr_set.substr(nbr_set.length-2,2)==",'"){
+                nbr_set=nbr_set.substr(0,nbr_set.length-2);
+            }else if(nbr_set=="'"){
+                nbr_set="";
+            }
+            nbr_set=nbr_set.replaceAll("','",",");
+            var ist_sql="drop table if exists "+tmptb+";\n"
+            +"create table "+tmptb+" as \nselect \n"+nbr_set+" nbr_set from dual;\n"+
+            "create table "+page3_tbname+" \nas \nselect distinct usr_nbr \nfrom "+tmptb+" \nlateral view explode(split(nbr_set, ',')) num as usr_nbr;\n"+
+            "drop table if exists "+tmptb+";\n";
+            $('#page3_ist_sql').val(ist_sql);
+        }else{
+            $('#page3_ist_sql').val("");
+        }
+        
+    }
+
+
+    /**
+     * @description: 根据参数返回查询SQL
+     * @param  orderNo         单号
+     * @param  tableName       表名
+     * @param  tableAlias      别名
+     * @param  limitCnt        记录数
+     * @param  conditionField  条件字段
+     * @param  conditionVal    条件值
+     * @return                 返回查询SQL
+     */            
+    function generateSQL(orderNo,tableName,tableAlias,limitCnt,conditionField,conditionVal){
+        if(orderNo!=undefined&&orderNo!=""){
+            orderNo="/*"+orderNo+"*/ ";
+        }
+        var sqlStr="select "+orderNo+"\n"+
+                "    "+tableAlias+".*\n" +
+                "from \n" +
+                "    "+tableName + " " + tableAlias 
+        if(conditionField!=undefined){
+            sqlStr=sqlStr+" where "+conditionField+"='"+conditionVal+"'";
+        }
+        sqlStr=sqlStr+ " limit "+limitCnt+";" 
+        return sqlStr;
+    }
+
+
+    function excel(){
+        $('body').removeAttr('class');
+        $('body').addClass('r');
+        $("#warningmessage").addClass("hide");
+        var text=$("#page4_excel1").val();
+        var text2=$("#page4_excel1").val();
+        var filed_separator=["|",":", String.fromCharCode(29)];
+        for (var i = 0; i < filed_separator.length; i++) {
+            if(text.indexOf(filed_separator[i]) != -1){
+                continue;
+            }
+            text=text.replaceAll("\t",filed_separator[i]);
+            $("#page4_text1").val(text);
+            break;
+        }
+        if(text.indexOf("\"") != -1){
+            console.error("数据可能有异常，检查是否单元格包含换行符！");
+            $("#warningmessage").removeClass("hide");
+        }
+
+        text2="'"+text2.replaceAll("\n","','");
+        if(text2.substr(text2.length-1,1)!="'"){                
+            text2=text2+"'";
+        }
+        else if(text2.substr(text2.length-2,2)==",'"){
+            text2=text2.substr(0,text2.length-2);
+        }else if(text2=="'"){
+            text2="";
+        }
+        $("#page4_text2").val(text2);
+
+    }
+
+    function myregexp(){
+        $('body').removeAttr('class');
+        $('body').addClass('y');
+        var txt=$("#page5_excel1").val();
+        var patt1=/(from|into|join|table|exists)[ \n\t]+(?!if)([^ ()"\n\t;)]+)/igm;
+        var patt2=/create[ \n]+table[ \n\t]+([^ ()"\n\t;)]+)/igm;
+        var arr =txt.match(patt1);
+        var arr2=txt.match(patt2);
+        var result1="";    
+        var res1="";
+        var result2="";    
+        var res2="";
+        var tables=[];
+        while(res1 = patt1.exec(txt)) {   
+            var tableName=res1[2].toUpperCase()+"\n";
+            tables.push(tableName);
+        } 
+        var tables2=[];
+        var tables3=[];
+        while(res2 = patt2.exec(txt)) {   
+            var tableName2=res2[1].toUpperCase()+"\n";
+            tables2.push(tableName2);
+            tables3.remove(tableName2);
+        } 
+        tables=qc(tables).sort();
+        tables2=qc(tables2).sort();
+        tables3=tables;
+        
+        var result3="";
+
+        for (var i = 0; i < tables.length ; i++) {
+            result1=result1+tables[i];
+        }
+        for (var i = 0; i < tables2.length ; i++) {
+            result2=result2+tables2[i]; 
+            tables3.remove(tables2[i]);               
+        }
+        for (var i = 0; i < tables3.length ; i++) {
+            if(tables3[i].length>=3)
+            result3=result3+tables3[i];                
+        }
+
+        $("#page5_text1").val(result3); 
+        $("#page5_text2").val(result2); 
+
+    }
+
+    function clipboard(){
+        $('body').removeAttr('class');
+        $('body').addClass('b');
+    }
+
+    Array.prototype.indexOf = function (val) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == val) return i;
+        }
+        return -1;
+    }; 
+
+    Array.prototype.remove = function (val) {
+        var index = this.indexOf(val);
+        if (index > -1) {
+            this.splice(index, 1);
+        }
+    };
+
+    function qc(arr) {   // 数组去重
+        var newsArr = [];
+        for (var i = 0; i < arr.length; i++) {
+            if (newsArr.indexOf(arr[i]) === -1) {
+                newsArr.push(arr[i]);
+            }
+        }
+        return newsArr;
+    }
+
+    function saveTextAsFile() {
+        var textToWrite = $("#page4_text1").val();
+        var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+        var date = new Date().format("yyyyMMdd");
+        var me=$("#me").val();
+        me=me==""? $("#me").attr("placeholder"):me;
+        var order_no=$("#order_no").val();
+        order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
+        var order_no_last6=order_no.substring(order_no.length-6);
+        var filename=me+"_"+date+"_"+order_no_last6+"_"+"ref"
+        var fileNameToSaveAs = filename+".csv";
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.innerHTML = "Download File";
+        if (window.webkitURL != null) {
+            // Chrome allows the link to be clicked without actually adding it to the DOM.
+            downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+        } else {
+            // Firefox requires the link to be added to the DOM before it can be clicked.
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+        }
+
+        downloadLink.click();
+    }
+
+    function addClipBoardInfo(val){
+        let html='<div class="input-group mb-1">'+
+            '<textarea rows="1" onclick="copyMe(this)" class="form-control autocopy" aria-label="tips">'+val+'</textarea>'+
+            '<button type="button" onclick="removeMe(this)" class="btn btn-outline-danger">删除</button>'+
+                '</div>';
+        $("#myClipBoard").append(html);        
+    }
+    function removeMe(which){
+        $(which).parent().remove();
+    }
+    function copyMe(which){
+        var ct =new copy_txt();  
+        $("input").each(function(){
+            var val=$(this).val();
+            ct.copy(val);
+        });
+        $(which).select();
+        var val1=$(which).val();
+        var val2=$(which).text();
+        var val=val2==""?val1:val2;
+        ct.copy(val);
+        $(which).select();
+        $(which).blur();
+    }
 
 </script>
 
@@ -943,19 +969,17 @@
             </div>
             <div class="col-sm-6">
                 <div class="input-group mb-3">
-                    <span class="input-group-text">常用内容</span>
-                    <textarea id="page6_excel1" rows="19" class="form-control" aria-label="tips"></textarea>
+                    <span class="input-group-text">内容</span>
+                    <textarea id="page6_content" rows="19" class="form-control" aria-label="tips"></textarea>
+                    <button id="addClipBoardBtn" type="button" class="btn btn-outline-primary">添加</button>
                 </div>
             </div>
-            <div class="col-sm-6">
-                <div class="input-group mb-1">
-                    <span  class="input-group-text">使用表</span>
+            <div id="myClipBoard" class="col-sm-6">
+                <!-- <div class="input-group mb-1">
+                    <button type="button" class="btn btn-outline-danger">删除</button>
                     <textarea id="page6_text1" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
-                </div>
-                <div class="input-group mb-1">
-                    <span class="input-group-text">临时表</span>
-                    <textarea id="page6_text2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
-                </div>
+                    <button type="button" class="btn btn-outline-primary">复制</button>
+                </div> -->
             </div>
         </div>
     </div>
