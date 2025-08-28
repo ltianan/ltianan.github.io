@@ -80,6 +80,9 @@
     .b{
         background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#9591bd), to(#e6cb91))
     }
+    .black{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#666565), to(#a4a3a2))
+    }
     .w{
         background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e1e1e1), to(#e6cb91))
     }
@@ -374,6 +377,13 @@
             $("#page6").removeClass("hide");
             clipboard();
         })
+        $("#btn_tip7").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page7").removeClass("hide");
+            changebg7();
+        })
         $("#getTbName").click(function () {
             myregexp();
         })
@@ -621,6 +631,11 @@
         $('body').addClass('b');
     }
 
+    function changebg7(){
+        $('body').removeAttr('class');
+        $('body').addClass('black');
+    }
+
     Array.prototype.indexOf = function (val) {
         for (var i = 0; i < this.length; i++) {
             if (this[i] == val) return i;
@@ -711,6 +726,7 @@
             <button id="btn_tip4" type="button" class="btn btn-outline-danger">Excel</button>
             <button id="btn_tip5" type="button" class="btn btn-outline-warning">RegExp</button>
             <button id="btn_tip6" type="button" class="btn btn-outline-info">Clipboard</button>
+            <button id="btn_tip7" type="button" class="btn btn-outline-dark">正则替换</button>
             
             <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
             <button type="button" class="btn btn-outline-warning">Warning</button>
@@ -983,7 +999,29 @@
                 </div> -->
             </div>
         </div>
+        <div id="page7" class="row cc">
+            <div class="col-sm-12">
+                <div class="alert alert-danger">
+                    Angle的<strong>正则替换工具</strong><input type="text" id="frrt_search" class="form-control" placeholder="正则" aria-label="正则" aria-describedby="frrt_search">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">内容</span>
+                    <textarea id="page7_content" rows="19" class="form-control" aria-label="tips"></textarea>
+                    <button id="addClipBoardBtn" type="button" class="btn btn-outline-primary">替换</button>
+                </div>
+            </div>
+            <div id="myCopypages" class="col-sm-6">
+                <!-- <div class="input-group mb-1">
+                    <button type="button" class="btn btn-outline-danger">删除</button>
+                    <textarea id="page6_text1" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                    <button type="button" class="btn btn-outline-primary">复制</button>
+                </div> -->
+            </div>
+        </div>
     </div>
+    
 
 
 

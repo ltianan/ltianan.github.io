@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正则替换工具 - 换行符替换为空格</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #4b6cb7;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .input-section, .output-section {
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            color: #4b6cb7;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+            line-height: 1.5;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 2px rgba(75, 108, 183, 0.2);
+        }
+        
+        .output-container {
+            position: relative;
+        }
+        
+        .output {
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 150px;
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .output:hover {
+            background-color: #f0f4ff;
+            border-color: #4b6cb7;
+        }
+        
+        .copy-notification {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4b6cb7;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .copy-notification.show {
+            opacity: 1;
+        }
+        
+        .copy-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+        }
+        
+        .copy-hint i {
+            margin-right: 5px;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(75, 108, 183, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        button:hover {
+            background: #395694;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(75, 108, 183, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #4b6cb7;
+            font-size: 18px;
+            margin-top: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .copy-hint {
+                position: relative;
+                margin-top: 10px;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>正则替换工具</h1>
+            <p class="description">将文本中的换行符替换为空格</p>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <h2><i class="fas fa-pen"></i> 输入内容</h2>
+                <textarea id="inputText" placeholder="请输入文本内容..."></textarea>
+            </div>
+            
+            <div class="button-container">
+                <button id="replaceBtn">
+                    <i class="fas fa-sync-alt"></i> 替换换行符
+                </button>
+            </div>
+            
+            <div class="output-section">
+                <h2><i class="fas fa-file-export"></i> 输出内容</h2>
+                <div class="output-container">
+                    <div id="outputText" class="output">替换后的结果将显示在这里...</div>
+                    <div class="copy-notification" id="copyNotification">已复制到剪贴板！</div>
+                    <div class="copy-hint">
+                        <i class="fas fa-mouse-pointer"></i> 点击输出区域可复制文本
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div>原文本字符数</div>
+                    <div id="originalChars" class="stat-value">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>换行符数量</div>
+                    <div id="newlineCount" class="stat-value">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>结果字符数</div>
+                    <div id="resultChars" class="stat-value">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>正则替换工具 &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const replaceBtn = document.getElementById('replaceBtn');
+            const originalChars = document.getElementById('originalChars');
+            const newlineCount = document.getElementById('newlineCount');
+            const resultChars = document.getElementById('resultChars');
+            const copyNotification = document.getElementById('copyNotification');
+            
+            // 更新字符统计
+            function updateStats() {
+                const text = inputText.value;
+                const originalLength = text.length;
+                const newlines = (text.match(/\n/g) || []).length;
+                
+                originalChars.textContent = originalLength;
+                newlineCount.textContent = newlines;
+            }
+            
+            // 输入时实时更新字符统计
+            inputText.addEventListener('input', updateStats);
+            
+            // 替换按钮点击事件
+            replaceBtn.addEventListener('click', function() {
+                const text = inputText.value;
+                // 使用正则表达式替换所有换行符为空格
+                const replacedText = text.replace(/\n/g, ' ');
+                
+                outputText.textContent = replacedText;
+                resultChars.textContent = replacedText.length;
+                
+                // 添加轻微动画效果
+                outputText.style.opacity = '0';
+                setTimeout(() => {
+                    outputText.style.transition = 'opacity 0.3s';
+                    outputText.style.opacity = '1';
+                }, 50);
+            });
+            
+            // 复制输出文本功能
+            outputText.addEventListener('click', function() {
+                if (outputText.textContent === '替换后的结果将显示在这里...') {
+                    return; // 没有内容时不执行复制
+                }
+                
+                // 创建文本区域保存文本
+                const textarea = document.createElement('textarea');
+                textarea.value = outputText.textContent;
+                document.body.appendChild(textarea);
+                
+                // 选择并复制文本
+                textarea.select();
+                document.execCommand('copy');
+                
+                // 移除临时文本区域
+                document.body.removeChild(textarea);
+                
+                // 显示复制成功通知
+                copyNotification.classList.add('show');
+                setTimeout(() => {
+                    copyNotification.classList.remove('show');
+                }, 2000);
+                
+                // 添加视觉反馈
+                outputText.style.backgroundColor = '#e6eeff';
+                setTimeout(() => {
+                    outputText.style.backgroundColor = '#f8f9fa';
+                }, 300);
+            });
+            
+            // 初始化统计
+            updateStats();
+        });
+    </script>
+</body>
+</html>
