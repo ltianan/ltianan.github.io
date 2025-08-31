@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分表建表语句生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 左侧输入面板 */
+        .input-panel {
+            width: 40%;
+            background-color: white;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a6fa5;
+        }
+        
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .panel-title i {
+            margin-right: 8px;
+            color: #4a6fa5;
+        }
+        
+        .panel-subtitle {
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+            border-color: #4a6fa5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+        
+        .date-range-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .date-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .month-picker-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .month-picker-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* 按钮样式 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #4a6fa5;
+            color: white;
+            flex: 2;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d5a80;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* 右侧输出面板 */
+        .output-panel {
+            width: 60%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .output-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .output-title i {
+            margin-right: 8px;
+            color: #28a745;
+        }
+        
+        .output-stats {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
+        .copy-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .copy-btn:hover {
+            background-color: #218838;
+        }
+        
+        .sql-output {
+            flex: 1;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        
+        /* 月份选择器 */
+        .month-picker {
+            position: absolute;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 200px;
+            padding: 10px;
+            display: none;
+        }
+        
+        .month-picker.active {
+            display: block;
+        }
+        
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .picker-year {
+            font-weight: 600;
+        }
+        
+        .picker-nav {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #495057;
+        }
+        
+        .picker-nav:hover {
+            color: #4a6fa5;
+        }
+        
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        
+        .month-option {
+            padding: 6px 3px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .month-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .month-option.selected {
+            background-color: #4a6fa5;
+            color: white;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+            
+            .input-panel, .output-panel {
+                width: 100%;
+                height: 50vh;
+            }
+            
+            .input-panel {
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧输入面板 -->
+        <div class="input-panel">
+            <div class="panel-header">
+                <div class="panel-title">⚙️ 输入配置</div>
+                <div class="panel-subtitle">配置表名、参考月份和分表月份范围</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">表名（多个表以英文逗号分隔）</label>
+                <textarea id="tableNames" class="form-control" placeholder="例如：EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M">EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M</textarea>
+                <div class="form-hint">多个表名用英文逗号分隔，不要包含月份后缀</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">参考表月份（已有表的月份）</label>
+                <div class="date-input-wrapper">
+                    <input type="text" id="refMonth" class="form-control" placeholder="点击右侧按钮选择月份" value="202511" readonly>
+                    <button class="month-picker-btn" onclick="showMonthPicker('refMonth')">📅</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">分表月份范围</label>
+                <div class="date-range-group">
+                    <div class="date-input-wrapper">
+                        <input type="text" id="startMonth" class="form-control" placeholder="开始月份" value="202501" readonly>
+                        <button class="month-picker-btn" onclick="showMonthPicker('startMonth')">📅</button>
+                    </div>
+                    <div class="date-input-wrapper">
+                        <input type="text" id="endMonth" class="form-control" placeholder="结束月份" value="202512" readonly>
+                        <button class="month-picker-btn" onclick="showMonthPicker('endMonth')">📅</button>
+                    </div>
+                </div>
+                <div class="form-hint">选择需要创建的分表月份范围</div>
+            </div>
+            
+            <div class="form-group">
+                <div id="tableCountInfo" style="font-size: 13px; color: #4a6fa5; font-weight: 500;"></div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateSQL()">生成建表语句</button>
+                <button class="btn btn-secondary" onclick="resetForm()">重置</button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #6c757d;">
+                <p><strong>使用说明：</strong></p>
+                <ul style="padding-left: 15px; margin-top: 5px;">
+                    <li><strong>表名格式：</strong>基础表名，不要包含月份后缀</li>
+                    <li><strong>参考月份：</strong>已有表的月份，新表将参考此表结构创建</li>
+                    <li><strong>月份范围：</strong>需要创建的分表的月份范围</li>
+                    <li><strong>生成格式：</strong>create table 表名_年月 as (select * from 表名_参考年月 where 1=0);</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 右侧输出面板 -->
+        <div class="output-panel">
+            <div class="output-header">
+                <div class="output-title">📄 生成的SQL语句</div>
+                <div>
+                    <span id="resultStats" class="output-stats"></span>
+                    <button class="copy-btn" onclick="copyToClipboard()">复制</button>
+                </div>
+            </div>
+            
+            <div id="sqlResult" class="sql-output">
+请填写左侧的配置信息，然后点击"生成建表语句"按钮
+            </div>
+        </div>
+    </div>
+    
+    <!-- 月份选择器 -->
+    <div id="monthPicker" class="month-picker">
+        <div class="picker-header">
+            <button class="picker-nav" onclick="changeYear(-1)">&lt;</button>
+            <span id="pickerYear" class="picker-year">2025</span>
+            <button class="picker-nav" onclick="changeYear(1)">&gt;</button>
+        </div>
+        <div id="monthGrid" class="month-grid">
+            <!-- 月份将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentYear = 2025;
+        let currentInputId = null;
+        const monthPicker = document.getElementById('monthPicker');
+        
+        // 初始化月份选择器
+        function initMonthPicker() {
+            const yearSpan = document.getElementById('pickerYear');
+            const monthGrid = document.getElementById('monthGrid');
+            
+            // 生成月份网格
+            function generateMonthGrid() {
+                monthGrid.innerHTML = '';
+                yearSpan.textContent = currentYear;
+                
+                const months = [
+                    {num: '01', name: '1月'}, {num: '02', name: '2月'}, {num: '03', name: '3月'},
+                    {num: '04', name: '4月'}, {num: '05', name: '5月'}, {num: '06', name: '6月'},
+                    {num: '07', name: '7月'}, {num: '08', name: '8月'}, {num: '09', name: '9月'},
+                    {num: '10', name: '10月'}, {num: '11', name: '11月'}, {num: '12', name: '12月'}
+                ];
+                
+                months.forEach(month => {
+                    const monthElement = document.createElement('div');
+                    monthElement.className = 'month-option';
+                    monthElement.textContent = month.name;
+                    monthElement.dataset.month = `${currentYear}${month.num}`;
+                    
+                    // 检查当前输入框的值是否与此月份匹配
+                    if (currentInputId) {
+                        const inputElement = document.getElementById(currentInputId);
+                        if (inputElement && inputElement.value === `${currentYear}${month.num}`) {
+                            monthElement.classList.add('selected');
+                        }
+                    }
+                    
+                    monthElement.addEventListener('click', function() {
+                        const selectedMonth = this.dataset.month;
+                        
+                        // 设置输入框的值
+                        if (currentInputId) {
+                            document.getElementById(currentInputId).value = selectedMonth;
+                        }
+                        
+                        // 关闭月份选择器
+                        hideMonthPicker();
+                        
+                        // 更新表数量信息
+                        updateTableCount();
+                    });
+                    
+                    monthGrid.appendChild(monthElement);
+                });
+            }
+            
+            // 初始生成月份网格
+            generateMonthGrid();
+            
+            // 点击页面其他区域关闭月份选择器
+            document.addEventListener('click', function(event) {
+                if (!monthPicker.contains(event.target) && 
+                    !event.target.classList.contains('month-picker-btn')) {
+                    hideMonthPicker();
+                }
+            });
+        }
+        
+        // 切换年份
+        function changeYear(delta) {
+            currentYear += delta;
+            initMonthPicker();
+        }
+        
+        // 显示月份选择器
+        function showMonthPicker(inputId) {
+            currentInputId = inputId;
+            
+            // 获取输入框的当前值
+            const inputElement = document.getElementById(inputId);
+            const currentValue = inputElement.value;
+            
+            // 如果有值，解析年份
+            if (currentValue && currentValue.length === 6) {
+                const year = parseInt(currentValue.substring(0, 4));
+                if (!isNaN(year) && year >= 2000 && year <= 2100) {
+                    currentYear = year;
+                }
+            } else {
+                // 默认使用当前年份
+                const now = new Date();
+                currentYear = now.getFullYear();
+            }
+            
+            // 重新初始化月份选择器
+            initMonthPicker();
+            
+            // 显示月份选择器
+            monthPicker.classList.add('active');
+            
+            // 定位月份选择器
+            const inputRect = inputElement.getBoundingClientRect();
+            monthPicker.style.top = (inputRect.bottom + window.scrollY + 5) + 'px';
+            monthPicker.style.left = (inputRect.left + window.scrollX) + 'px';
+        }
+        
+        // 隐藏月份选择器
+        function hideMonthPicker() {
+            monthPicker.classList.remove('active');
+        }
+        
+        // 解析表名字符串
+        function parseTableNames(tableNamesText) {
+            if (!tableNamesText) return [];
+            
+            // 按逗号分割，并清理空白字符
+            return tableNamesText
+                .split(',')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+        }
+        
+        // 生成月份列表
+        function generateMonthList(startMonth, endMonth) {
+            const months = [];
+            const startYear = parseInt(startMonth.substring(0, 4));
+            const startMonthNum = parseInt(startMonth.substring(4, 6));
+            const endYear = parseInt(endMonth.substring(0, 4));
+            const endMonthNum = parseInt(endMonth.substring(4, 6));
+            
+            let currentYear = startYear;
+            let currentMonth = startMonthNum;
+            
+            while (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonthNum)) {
+                const monthStr = currentYear.toString() + currentMonth.toString().padStart(2, '0');
+                months.push(monthStr);
+                
+                currentMonth++;
+                if (currentMonth > 12) {
+                    currentMonth = 1;
+                    currentYear++;
+                }
+            }
+            
+            return months;
+        }
+        
+        // 更新表数量信息
+        function updateTableCount() {
+            const tableNamesText = document.getElementById('tableNames').value.trim();
+            const tableNames = parseTableNames(tableNamesText);
+            
+            if (tableNames.length > 0) {
+                const startMonth = document.getElementById('startMonth').value.trim();
+                const endMonth = document.getElementById('endMonth').value.trim();
+                
+                if (/^\d{6}$/.test(startMonth) && /^\d{6}$/.test(endMonth)) {
+                    try {
+                        const months = generateMonthList(startMonth, endMonth);
+                        document.getElementById('tableCountInfo').textContent = 
+                            `检测到 ${tableNames.length} 个表，将生成 ${tableNames.length * months.length} 个分表`;
+                    } catch (e) {
+                        document.getElementById('tableCountInfo').textContent = 
+                            `检测到 ${tableNames.length} 个表`;
+                    }
+                } else {
+                    document.getElementById('tableCountInfo').textContent = 
+                        `检测到 ${tableNames.length} 个表`;
+                }
+            } else {
+                document.getElementById('tableCountInfo').textContent = '';
+            }
+        }
+        
+        // 生成SQL语句
+        function generateSQL() {
+            const tableNamesText = document.getElementById('tableNames').value.trim();
+            const refMonth = document.getElementById('refMonth').value.trim();
+            const startMonth = document.getElementById('startMonth').value.trim();
+            const endMonth = document.getElementById('endMonth').value.trim();
+            
+            // 验证输入
+            if (!tableNamesText) {
+                alert("请输入表名");
+                return;
+            }
+            
+            const tableNames = parseTableNames(tableNamesText);
+            
+            if (tableNames.length === 0) {
+                alert("未找到有效的表名，请检查输入格式");
+                return;
+            }
+            
+            if (!/^\d{6}$/.test(refMonth)) {
+                alert("参考月份格式不正确，请输入6位数字（如：202511）");
+                return;
+            }
+            
+            if (!/^\d{6}$/.test(startMonth) || !/^\d{6}$/.test(endMonth)) {
+                alert("月份范围格式不正确，请输入6位数字（如：202501）");
+                return;
+            }
+            
+            const startYear = parseInt(startMonth.substring(0, 4));
+            const startMonthNum = parseInt(startMonth.substring(4, 6));
+            const endYear = parseInt(endMonth.substring(0, 4));
+            const endMonthNum = parseInt(endMonth.substring(4, 6));
+            
+            if (startYear > endYear || (startYear === endYear && startMonthNum > endMonthNum)) {
+                alert("开始月份不能晚于结束月份");
+                return;
+            }
+            
+            // 生成月份列表
+            const months = generateMonthList(startMonth, endMonth);
+            
+            // 生成SQL语句
+            let sql = `-- 分表建表语句生成结果\n`;
+            sql += `-- 生成时间: ${new Date().toLocaleString()}\n`;
+            sql += `-- 参考月份: ${refMonth}\n`;
+            sql += `-- 分表月份范围: ${startMonth} 到 ${endMonth}\n`;
+            sql += `-- 表数量: ${tableNames.length} 个\n`;
+            sql += `-- 月份数量: ${months.length} 个\n\n`;
+            
+            // 为每个表生成每个月份的分表语句
+            let totalTables = 0;
+            tableNames.forEach((tableName, tableIndex) => {
+                sql += `-- ${tableName} 的分表语句\n`;
+                
+                months.forEach(month => {
+                    sql += `create table ${tableName}_${month} as (select * from ${tableName}_${refMonth} where 1=0);\n`;
+                    totalTables++;
+                });
+                
+                // 如果不是最后一个表，添加空行分隔
+                if (tableIndex < tableNames.length - 1) {
+                    sql += `\n`;
+                }
+            });
+            
+            sql += `\n-- 共生成 ${totalTables} 个分表`;
+            
+            // 显示结果
+            document.getElementById('sqlResult').textContent = sql;
+            
+            // 更新结果统计
+            document.getElementById('resultStats').textContent = 
+                `${tableNames.length}个表 × ${months.length}个月份 = ${totalTables}个分表`;
+            
+            // 更新表数量信息
+            updateTableCount();
+        }
+        
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const sqlResult = document.getElementById('sqlResult');
+            const text = sqlResult.textContent;
+            
+            if (!text || text.includes("请填写左侧的配置信息")) {
+                alert("没有可复制的内容，请先生成SQL语句");
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = "已复制!";
+                copyBtn.style.backgroundColor = "#1e7e34";
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.backgroundColor = "#28a745";
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败: ', err);
+                alert("复制失败，请手动选择文本复制");
+            });
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('tableNames').value = "EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M";
+            document.getElementById('refMonth').value = "202511";
+            document.getElementById('startMonth').value = "202501";
+            document.getElementById('endMonth').value = "202512";
+            document.getElementById('sqlResult').textContent = "请填写左侧的配置信息，然后点击\"生成建表语句\"按钮";
+            document.getElementById('tableCountInfo').textContent = "";
+            document.getElementById('resultStats').textContent = "";
+        }
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            // 初始化月份选择器
+            initMonthPicker();
+            
+            // 为表名输入框添加实时计数
+            document.getElementById('tableNames').addEventListener('input', updateTableCount);
+            
+            // 为月份输入框添加实时计数
+            document.getElementById('startMonth').addEventListener('change', updateTableCount);
+            document.getElementById('endMonth').addEventListener('change', updateTableCount);
+            
+            // 自动计算表数量
+            updateTableCount();
+            
+            // 自动生成示例SQL
+            generateSQL();
+        };
+    </script>
+</body>
+</html>
