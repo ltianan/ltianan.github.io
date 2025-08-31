@@ -1027,4 +1027,993 @@
 
 </body>
 
+</html><html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Work-Helper</title>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <!-- CSS only -->
+    <link href="css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <!-- jQuery and JavaScript Bundle with Popper -->
+    <script src="js/jquery-3.5.1.slim.min.js"></script>
+</head>
+<style>
+
+    textarea:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="datetime"]:focus,
+    input[type="datetime-local"]:focus,
+    input[type="date"]:focus,
+    input[type="month"]:focus,
+    input[type="time"]:focus,
+    input[type="week"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="url"]:focus,
+    input[type="search"]:focus,
+    input[type="tel"]:focus,
+    input[type="color"]:focus,
+    .uneditable-input:focus {   
+    border-color: rgba(201, 104, 239, 0.8);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+    outline: 0 none;
+    background-color:transparent;
+    }
+
+    ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:lightseagreen !important;
+    }
+    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color: lightseagreen !important;
+    }
+    ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color: lightseagreen !important;
+    }
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: lightseagreen !important;
+    }
+    .form-control{
+        background-color: transparent;
+        border:1px solid #bb36a6;
+    }
+    .input-group-text{
+        background-color: transparent;
+        border:1px solid #bb36a6;
+        color: #97353d;
+    }
+    .m{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#9bc9fd), to(#e6cb91))
+        /* background:url("https://www.mickeyshannon.com/photos/zoom/dallas-divide-sunrise.jpg") no-repeat fixed; */
+        /* background:url("https://cn.bing.com/th?id=OHR.ChurchillBears_EN-CN7324366509_1920x1080.jpg&rf=LaDigue_1920x1080.jpg") no-repeat fixed; */
+        /* background:url("https://www.celebritycruises.com/content/dam/celebrity/ports/apia-samoa-top-ports-80-opacity.jpg") no-repeat center fixed; */
+        /* background:url("https://img.17sucai.com/upload/18693/2013-07-31/89d2029ffbff694503f7526b08262fca.png?x-oss-process=style/pri") no-repeat center fixed; */
+        /* background:url("https://www.bing.com/th/id/ABT91DFB03A959A57F7AFA918B02EA3BECD506996CB303067EE35932D77EE7CE3D8?qlt=90&pid=InlineBlock") no-repeat ; */
+        /* background:url("https://www.beihaiting.com/uploads/allimg/150528/10723-15052QAZ4116.jpg") no-repeat ; */
+    }
+    .r{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#bd9191), to(#e6cb91))
+    }
+    .y{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#bdb691), to(#e6cb91))
+    }
+    .g{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#91bd99), to(#e6cb91))
+    }
+    .b{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#9591bd), to(#e6cb91))
+    }
+    .w{
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e1e1e1), to(#e6cb91))
+    }
+    .trans{
+        background-color: transparent;
+    }
+    .bd-example {
+        padding: 1.5rem;
+        margin-right: 0;
+        margin-left: 0;
+        border-width: 1px;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+    }
+    .hide{
+        display: none;
+    }
+    .autocopy{
+        border-color:rgb(156, 122, 88);
+    }
+    .logo{
+        filter:sepia(.3) contrast(1.1) brightness(0.6) grayscale(0) hue-rotate(129deg);
+    }
+
+</style>
+<script>
+    var copy_txt = function () {//无组件复制
+            var _this = this;
+            this.copy = function (txt) {
+
+                $("#input_copy_txt_to_board").val(txt);//赋值
+                $("#input_copy_txt_to_board").removeClass("hide");//显示
+                $("#input_copy_txt_to_board").focus();//取得焦点
+                $("#input_copy_txt_to_board").select();//选择
+                document.execCommand("Copy");
+                $("#input_copy_txt_to_board").addClass("hide");//隐藏
+            }
+
+            //-----------
+            let html = '<textarea type class="hide" id="input_copy_txt_to_board" value="" /></textarea>';//添加一个隐藏的元素
+            $("body").append(html);
+        }
+    Date.prototype.format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+    $(document).ready(function () {
+        if(localStorage.getItem("order_no2")!=undefined){
+            $("#order_no2").val(localStorage.getItem("order_no"));
+        }
+        if(localStorage.getItem("order_no")!=undefined){
+            $("#order_no").val(localStorage.getItem("order_no"));
+        }
+        if(localStorage.getItem("operator")!=undefined){
+            $("#operator").val(localStorage.getItem("operator"));
+        }
+        if(localStorage.getItem("me")!=undefined){
+            $("#me").val(localStorage.getItem("me"));
+        }
+        if(localStorage.getItem("tablename")!=undefined){
+            $("#tablename").val(localStorage.getItem("tablename"));
+        }
+        if(localStorage.getItem("page3_odrno")!=undefined){
+            $("#page3_odrno").val(localStorage.getItem("page3_odrno"));
+        }
+
+        $("#page3_odrno").blur(function(){
+            if($("#page3_odrno").val()!=""){
+                localStorage.setItem("page3_odrno",$("#page3_odrno").val());
+            }else{
+                localStorage.removeItem("page3_odrno");
+            }
+        });
+
+
+        $("#btn-jcfw").change(function(){
+            var tablename=$("#page3_tbname").val();
+            if($("#btn-jcfw").is(':checked')){
+                if(tablename.substr(0,4)=="jcfw"){
+                }else{
+                    if(tablename!=undefined&&tablename!=""){
+                        tablename="jcfw."+tablename;
+                    }
+                }                
+            }else{
+                if(tablename.substr(0,4)=="jcfw"){
+                    tablename=tablename.substring(5);
+                }
+            }
+            $("#page3_tbname").val(tablename);
+            sql3();
+        });
+
+        $("input").attr("autocomplete","off");
+        $("#tip1").val(
+                '-- show tables'+'\n'+'set hive.exec.parallel=true;'+'\n'+'set hive.exec.mode.local.auto=true;'+'\n'
+                +'set hive.exec.parallel.thread.number=16; -- 同一个sql允许并行任务的最大线程数'+'\n'
+
+                +'set hive.auto.convert.join = true; -- 是否自动转换为mapjoin'+'\n'
+                +'set hive.mapjoin.smalltable.filesize=50000000; -- 小表的最大文件大小，默认为25000000，即25M'+'\n'
+                +'set hive.auto.convert.join.noconditionaltask.size = 10000000; '+'\n'
+
+                +'set hive.fetch.task.conversion=more; -- 让可以不走mapreduce任务的，就不走mapreduce任务'+'\n'
+                +'set hive.map.aggr=true;              -- map端聚合，降低传给reduce的数据量'+'\n'
+            );
+        $("#tip2").val(
+                'spark-beeline\n'
+            );
+
+            $("#order_no,#order_no2").click(function(){
+                $(this).select();
+            });
+
+        $("#addClipBoardBtn").click(function(){
+            var content=$("#page6_content").val();
+            addClipBoardInfo(content);
+        })
+
+        $("#btn_tip1").click(function () {
+            $('body').removeAttr('class');
+            $('body').addClass('m');
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#helper").removeClass("hide");
+            var date = new Date().format("yyyyMMdd");
+            var me=$("#me").val();
+            me=me==""? $("#me").attr("placeholder"):me;
+            var order_no=$("#order_no").val();
+            order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
+            var order_no_last6=order_no.substring(order_no.length-6);
+            var tablename = $("#tablename").val();
+            tablename=tablename==""? $("#tablename").attr("placeholder"):tablename;
+            var tablealias = $("#tablealias").val();
+            tablealias=tablealias==""? $("#tablealias").attr("placeholder"):tablealias;
+            var fq=$("#fq").val();
+            // fq=fq==""? $("#fq").attr("placeholder"):fq;
+            var px=$("#px").val();
+            px=px==""? $("#px").attr("placeholder"):px;
+            if($("#tablename").val()!=""){
+                localStorage.setItem("tablename",tablename);
+            }else{
+                localStorage.removeItem("tablename");
+            }
+            if($("#me").val()!=""){
+                localStorage.setItem("me",me);
+            }else{
+                localStorage.removeItem("me");
+            }
+            if($("#order_no").val()!=""){
+                localStorage.setItem("order_no",order_no);
+            }else{
+                localStorage.removeItem("order_no");
+            }
+
+
+            $("#result").val("create table szdsjsxm_sj."+me+"_"+date+"_"+order_no_last6+"_"+
+            "\nrow format delimited fields terminated by '|' stored as textfile tblproperties (\n'serialization.null.format' = '',\n'serialization.encoding' = 'GBK'\n) as\n");
+            $("#upload_tip").val(
+                "zip -re "+order_no+".zip"+"\n"+
+                "put "+order_no+".zip"+"\n"+
+                "mv /home/zengy/"+order_no+".zip"+" ./"+order_no+".zip"+"\n"+
+                "chmod 777 ./"+order_no+".zip"+"\n"+
+                "文件已上传至/ftpdsjs/sz/tmp/"+order_no+".zip"+"\n"+
+                "密码："+order_no_last6
+            );
+            var partition_by=fq==""?fq:"partition by "+fq+" ";
+            $("#sql_tip").text(
+                "select * from (select a.*,row_number() over("+partition_by+"order by "+px+") rn"+tablealias+" from "+tablename + " a) "+tablealias+" where rn"+tablealias+"=1;"
+            );
+            var cc=$("#cc").val();
+            cc=cc==""? $("#cc").attr("placeholder"):cc;
+            $("#sql_tip2").text(
+                "select" + "\n" +
+                "    count(1)," + "\n" +
+                "    count("+cc+")," + "\n" +
+                "    count(distinct "+cc+")" + "\n" +
+                "from" + "\n" +
+                "    "+tablename + " " + tablealias + ";"
+            );
+            var lastmonth=new Date(new Date().setMonth((new Date().getMonth()-1))).format("yyyyMM");
+            console.log(lastmonth);
+            var month=lastmonth%100;
+            var lastday=30;
+            if(month==1||month==3||month==5||month==7||month==8||month==10||month==12){
+                lastday=31;
+            }
+            if(month==2){
+                lastday=28;
+                if(lastmonth/100%4==0&&lastmonth/100%100!=0||lastmonth/100%400==0){
+                    lastday=29
+                }
+            }
+            
+
+            $("#sql_tip3").text(
+                "select" + "\n" +
+                "    day," + "\n" +
+                "    count(1)," + "\n" +
+                "    count("+cc+")," + "\n" +
+                "    count(distinct "+cc+")" + "\n" +
+                "from" + "\n" +
+                "    "+tablename + " " + tablealias + "\n" +
+                "where" + "\n" +
+                "    month = "+lastmonth + "\n" +
+                "    and day in(" + lastmonth * 10 + 1 + "," + lastmonth * 10 + 5 + "," + lastmonth * 1 + lastday + ")" + "\n" +
+                "group by" + "\n" +
+                "    day \norder by day asc;"
+            );
+            var year=$("#year").val();
+            year=year==""? $("#year").attr("placeholder"):year;
+            var febday=28;
+            if(year%4==0&&year%100!=0||year%400==0){
+                febday=29
+            }
+            $("#tip4").text(
+                year+"01,"+year+"02,"+year+"03,"+year+"04,"+year+"05,"+year+"06,"+year+"07,"+year+"08,"+
+                year+"09,"+year+"10,"+year+"11,"+year+"12"+"\n"+
+                year+"0131,"+year+"02"+febday+","+year+"0331,"+year+"0430,"+year+"0531,"+year+"0630,"+year+"0731,"+
+                year+"0831,"+year+"0930,"+year+"1031,"+year+"1130,"+year+"1231"
+            );
+
+
+
+        });
+        $("#btn_tip1").click();
+        $(".page1").keyup(function(){
+            $("#btn_tip1").click();
+        });
+
+
+        var ct =new copy_txt();  
+        $("input").each(function(){
+            var val=$(this).val();
+            ct.copy(val);
+        });
+        $('.autocopy').on('click', function () {
+            $(this).select();
+            var val1=$(this).val();
+            var val2=$(this).text();
+            var val=val2==""?val1:val2;
+            ct.copy(val);
+            $(this).select();
+            $(this).blur();
+        });
+        $("#btn_tip2").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page2").removeClass("hide");
+            huidan();
+        })
+        $("#wod,#order_no2,#workhours,#appendix,#operator").keyup(huidan);
+        $("#btn_tip3").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page3").removeClass("hide");
+            sql3();
+        })
+        $("#btn_tip4").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page4").removeClass("hide");
+            excel();
+        })
+        $("#btn_tip5").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page5").removeClass("hide");
+            myregexp();
+        })
+        $("#btn_tip6").click(function () {
+            $(".cc").each(function(){
+                $(this).addClass("hide");
+            });
+            $("#page6").removeClass("hide");
+            clipboard();
+        })
+        $("#getTbName").click(function () {
+            myregexp();
+        })
+
+
+        $("#page3_tbname,#page3_odrno,#page3_condition,#page3_order,#page3_rc,#page3_group,#page3_field_cnt,#page3_field_seperator,#page3_batch,#page3_nbr").keyup(sql3);
+
+        $("#save").click(saveTextAsFile);
+
+    });
+    
+    function huidan(){
+        $('body').removeAttr('class');
+        $('body').addClass('g');
+        var wod=$("#wod").val();
+        var order_no=$("#order_no2").val();
+        order_no=order_no==""? $("#order_no2").attr("placeholder"):order_no;
+        var operator=$("#operator").val();
+        operator=operator==""? $("#operator").attr("placeholder"):operator;
+        var workhours=$("#workhours").val();
+        workhours=workhours==""? $("#workhours").attr("placeholder"):workhours;
+        var appendix=$("#appendix").val();
+        appendix=appendix==""? $("#appendix").attr("placeholder"):appendix;
+        if($("#order_no2").val()!=""){
+            localStorage.setItem('order_no2',order_no);
+        }else{
+                localStorage.removeItem("order_no2");
+            }
+        if($("#operator").val()!=""){
+            localStorage.setItem('operator',operator);
+        }else{
+                localStorage.removeItem("operator");
+            }
+        $("#huidan1").val(
+            "该需求"+wod+",已将取数结果上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan2").val(
+            "该需求"+wod+",已将结果上传至附件："+appendix+"。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+        $("#huidan3").val(
+            "该需求"+wod+",已将统计结果上传至附件："+appendix+",清单已上传至下载中心，文件地址：/ftpdsjs/sz/tmp/"+order_no+".zip。处理人:"+operator+",工作量："+workhours+"h，请审核，谢谢！"
+        );
+    }
+
+    function sql3(){
+        $('body').removeAttr('class');
+        $('body').addClass('w');
+        var page3_tbname=$("#page3_tbname").val();
+        page3_tbname=page3_tbname==""? $("#page3_tbname").attr("placeholder"):page3_tbname;
+        var page3_odrno=$("#page3_odrno").val();
+        if($("#btn-jcfw").is(':checked')){
+            if(page3_tbname.substr(0,4)=="jcfw"){
+            }else{
+                if(page3_tbname!=undefined&&page3_tbname!=""){
+                    page3_tbname="jcfw."+page3_tbname;
+                }
+            }
+        }
+        var page3_condition=$("#page3_condition").val();
+        var page3_order=$("#page3_order").val();
+        var page3_rc=$("#page3_rc").val();
+        var page3_group=$("#page3_group").val();
+        var page3_nbr=$("#page3_nbr").val();
+        page3_tablealias="a";
+        var SQL1=generateSQL(page3_odrno,page3_tbname,'a','10',null,null);
+        $("#page3_sql1").val(SQL1);
+        var fivedaysago=new Date(new Date().setDate((new Date().getDate()-5))).format("yyyyMMdd");
+        var SQL5=generateSQL(page3_odrno,page3_tbname,'a','10','day',fivedaysago);
+        $("#page3_sql5").val(SQL5);
+        var twomonthago=new Date(new Date().setMonth((new Date().getMonth()-2))).format("yyyyMM");
+        var SQL6=generateSQL(page3_odrno,page3_tbname,'a','10','month',twomonthago);
+        $("#page3_sql6").val(SQL6);
+        $("#page3_sql2").val("show partitions "+page3_tbname + ";" );
+        $("#page3_sql3").val("desc formatted  "+page3_tbname + ";" );
+        var page3_field_cnt=$("#page3_field_cnt").val();
+        page3_field_cnt=page3_field_cnt==""? $("#page3_field_cnt").attr("placeholder"):page3_field_cnt;
+        var page3_field_seperator=$("#page3_field_seperator").val();
+        page3_field_seperator=page3_field_seperator==""? $("#page3_field_seperator").attr("placeholder"):page3_field_seperator;
+        var page3_batch=$("#page3_batch").val();
+        page3_batch=page3_batch==""? $("#page3_batch").attr("placeholder"):page3_batch;
+        var field_info="";
+        for(var i=0;i<page3_field_cnt;i++){
+            if(i==0){
+                field_info+="trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) usr_nbr";
+            }else{
+                field_info+="\n    ,trim(split(usr_nbr,'\\\\"+page3_field_seperator+"')["+i+"]) "+"field_"+i;
+            }
+        }
+        $("#page3_sql4").val("create table "+page3_tbname+"\nas\nselect\n    distinct "+field_info+"\nfrom\n"+"    szdsjsxm_sj.target_phone_szdsjsxm_sj_model\nwhere\n    batch_seq = '"+page3_batch+"';")
+        
+        if(page3_nbr!=undefined && page3_nbr!=""){
+            //左侧批量生成查询语句
+            var tableNames=page3_nbr.split("\n");
+            var sql11="";
+            var sql55="";
+            var sql66="";
+            $.each(tableNames,function(i,tableNamei){
+                tableNamei=tableNamei.trim();
+                sql11=sql11+generateSQL(page3_odrno,tableNamei,'a','10',null,null).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+                sql55=sql55+generateSQL(page3_odrno,tableNamei,'a','10','day',fivedaysago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+                sql66=sql66+generateSQL(page3_odrno,tableNamei,'a','10','month',twomonthago).replace(/\n/g," ").replace(/   /g," ").replace(/  /g," ")+"\n";
+            });
+            $("#page3_sql1").val(sql11);
+            $("#page3_sql5").val(sql55);
+            $("#page3_sql6").val(sql66);
+
+
+
+
+
+            //右侧插入单字段语句
+            var random_int=Math.round(Math.random()*1000);
+            var tmptb=page3_tbname+"_tmp_"+random_int;
+            var nbr_set="";  //'001,002'
+            nbr_set="'"+page3_nbr.replaceAll("\n","','");
+            if(nbr_set.substr(nbr_set.length-1,1)!="'"){                
+                nbr_set=nbr_set+"'";
+            }
+            else if(nbr_set.substr(nbr_set.length-2,2)==",'"){
+                nbr_set=nbr_set.substr(0,nbr_set.length-2);
+            }else if(nbr_set=="'"){
+                nbr_set="";
+            }
+            nbr_set=nbr_set.replaceAll("','",",");
+            var ist_sql="drop table if exists "+tmptb+";\n"
+            +"create table "+tmptb+" as \nselect \n"+nbr_set+" nbr_set from dual;\n"+
+            "create table "+page3_tbname+" \nas \nselect distinct usr_nbr \nfrom "+tmptb+" \nlateral view explode(split(nbr_set, ',')) num as usr_nbr;\n"+
+            "drop table if exists "+tmptb+";\n";
+            $('#page3_ist_sql').val(ist_sql);
+        }else{
+            $('#page3_ist_sql').val("");
+        }
+        
+    }
+
+
+    /**
+     * @description: 根据参数返回查询SQL
+     * @param  orderNo         单号
+     * @param  tableName       表名
+     * @param  tableAlias      别名
+     * @param  limitCnt        记录数
+     * @param  conditionField  条件字段
+     * @param  conditionVal    条件值
+     * @return                 返回查询SQL
+     */            
+    function generateSQL(orderNo,tableName,tableAlias,limitCnt,conditionField,conditionVal){
+        if(orderNo!=undefined&&orderNo!=""){
+            orderNo="/*"+orderNo+"*/ ";
+        }
+        var sqlStr="select "+orderNo+"\n"+
+                "    "+tableAlias+".*\n" +
+                "from \n" +
+                "    "+tableName + " " + tableAlias 
+        if(conditionField!=undefined){
+            sqlStr=sqlStr+" where "+conditionField+"='"+conditionVal+"'";
+        }
+        sqlStr=sqlStr+ " limit "+limitCnt+";" 
+        return sqlStr;
+    }
+
+
+    function excel(){
+        $('body').removeAttr('class');
+        $('body').addClass('r');
+        $("#warningmessage").addClass("hide");
+        var text=$("#page4_excel1").val();
+        var text2=$("#page4_excel1").val();
+        var filed_separator=["|",":", String.fromCharCode(29)];
+        for (var i = 0; i < filed_separator.length; i++) {
+            if(text.indexOf(filed_separator[i]) != -1){
+                continue;
+            }
+            text=text.replaceAll("\t",filed_separator[i]);
+            $("#page4_text1").val(text);
+            break;
+        }
+        if(text.indexOf("\"") != -1){
+            console.error("数据可能有异常，检查是否单元格包含换行符！");
+            $("#warningmessage").removeClass("hide");
+        }
+
+        text2="'"+text2.replaceAll("\n","','");
+        if(text2.substr(text2.length-1,1)!="'"){                
+            text2=text2+"'";
+        }
+        else if(text2.substr(text2.length-2,2)==",'"){
+            text2=text2.substr(0,text2.length-2);
+        }else if(text2=="'"){
+            text2="";
+        }
+        $("#page4_text2").val(text2);
+
+    }
+
+    function myregexp(){
+        $('body').removeAttr('class');
+        $('body').addClass('y');
+        var txt=$("#page5_excel1").val();
+        var patt1=/(from|into|join|table|exists)[ \n\t]+(?!if)([^ ()"\n\t;)]+)/igm;
+        var patt2=/create[ \n]+table[ \n\t]+([^ ()"\n\t;)]+)/igm;
+        var arr =txt.match(patt1);
+        var arr2=txt.match(patt2);
+        var result1="";    
+        var res1="";
+        var result2="";    
+        var res2="";
+        var tables=[];
+        while(res1 = patt1.exec(txt)) {   
+            var tableName=res1[2].toUpperCase()+"\n";
+            tables.push(tableName);
+        } 
+        var tables2=[];
+        var tables3=[];
+        while(res2 = patt2.exec(txt)) {   
+            var tableName2=res2[1].toUpperCase()+"\n";
+            tables2.push(tableName2);
+            tables3.remove(tableName2);
+        } 
+        tables=qc(tables).sort();
+        tables2=qc(tables2).sort();
+        tables3=tables;
+        
+        var result3="";
+
+        for (var i = 0; i < tables.length ; i++) {
+            result1=result1+tables[i];
+        }
+        for (var i = 0; i < tables2.length ; i++) {
+            result2=result2+tables2[i]; 
+            tables3.remove(tables2[i]);               
+        }
+        for (var i = 0; i < tables3.length ; i++) {
+            if(tables3[i].length>=3)
+            result3=result3+tables3[i];                
+        }
+
+        $("#page5_text1").val(result3); 
+        $("#page5_text2").val(result2); 
+
+    }
+
+    function clipboard(){
+        $('body').removeAttr('class');
+        $('body').addClass('b');
+    }
+
+    Array.prototype.indexOf = function (val) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == val) return i;
+        }
+        return -1;
+    }; 
+
+    Array.prototype.remove = function (val) {
+        var index = this.indexOf(val);
+        if (index > -1) {
+            this.splice(index, 1);
+        }
+    };
+
+    function qc(arr) {   // 数组去重
+        var newsArr = [];
+        for (var i = 0; i < arr.length; i++) {
+            if (newsArr.indexOf(arr[i]) === -1) {
+                newsArr.push(arr[i]);
+            }
+        }
+        return newsArr;
+    }
+
+    function saveTextAsFile() {
+        var textToWrite = $("#page4_text1").val();
+        var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+        var date = new Date().format("yyyyMMdd");
+        var me=$("#me").val();
+        me=me==""? $("#me").attr("placeholder"):me;
+        var order_no=$("#order_no").val();
+        order_no=order_no==""? $("#order_no").attr("placeholder"):order_no;
+        var order_no_last6=order_no.substring(order_no.length-6);
+        var filename=me+"_"+date+"_"+order_no_last6+"_"+"ref"
+        var fileNameToSaveAs = filename+".csv";
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.innerHTML = "Download File";
+        if (window.webkitURL != null) {
+            // Chrome allows the link to be clicked without actually adding it to the DOM.
+            downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+        } else {
+            // Firefox requires the link to be added to the DOM before it can be clicked.
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+        }
+
+        downloadLink.click();
+    }
+
+    function addClipBoardInfo(val){
+        let html='<div class="input-group mb-1">'+
+            '<textarea rows="1" onclick="copyMe(this)" class="form-control autocopy" aria-label="tips">'+val+'</textarea>'+
+            '<button type="button" onclick="removeMe(this)" class="btn btn-outline-danger">删除</button>'+
+                '</div>';
+        $("#myClipBoard").append(html);        
+    }
+    function removeMe(which){
+        $(which).parent().remove();
+    }
+    function copyMe(which){
+        var ct =new copy_txt();  
+        $("input").each(function(){
+            var val=$(this).val();
+            ct.copy(val);
+        });
+        $(which).select();
+        var val1=$(which).val();
+        var val2=$(which).text();
+        var val=val2==""?val1:val2;
+        ct.copy(val);
+        $(which).select();
+        $(which).blur();
+    }
+
+</script>
+
+<body class="m">
+    <div class="container">
+        <div class="bd-example">
+            <img class="logo" src="images/Logox.png" width="150px" alt="Logo">
+            <button id="btn_tip1" type="button" class="btn btn-outline-primary">生成</button>
+            <button id="btn_tip2" type="button" class="btn btn-outline-success">TIPS</button>
+            <button id="btn_tip3" type="button" class="btn btn-outline-light">SQL</button>
+            <button id="btn_tip4" type="button" class="btn btn-outline-danger">Excel</button>
+            <button id="btn_tip5" type="button" class="btn btn-outline-warning">RegExp</button>
+            <button id="btn_tip6" type="button" class="btn btn-outline-info">Clipboard</button>
+            
+            <!-- <button type="button" class="btn btn-outline-secondary">Secondary</button>
+            <button type="button" class="btn btn-outline-warning">Warning</button>
+            <button type="button" class="btn btn-outline-dark">Dark</button> -->
+        </div>
+        <div id="helper" class="row cc">
+            <div class="col-sm-5">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1">表名</span>
+                    <input id="tablename" type="text" class="form-control page1" placeholder="jcfw.TO_BASS_USR" aria-label="jcfw.TO_BASS_USR"
+                    aria-describedby="basic-addon1">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon2">表别名</span>
+                    <input id="tablealias" type="text" class="form-control page1" placeholder="a" aria-label="a"
+                    aria-describedby="basic-addon2">
+                    <span class="input-group-text" id="basic-addon12">年份</span>
+                    <input id="year" type="text" class="form-control page1" placeholder="2022" aria-label="2022"
+                    aria-describedby="basic-addon12">
+                </div>
+
+                <div class="input-group mb-3" >
+                    <span class="input-group-text" id="basic-addon3">分区字段</span>
+                    <input id="fq" type="text" class="form-control page1" placeholder="" aria-label="" 
+                    aria-describedby="basic-addon3">
+                    <span class="input-group-text" id="basic-addon4">排序字段</span>
+                    <input id="px" type="text" class="form-control page1" placeholder="day desc" aria-label="day desc"
+                    aria-describedby="basic-addon4">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon10">查重字段</span>
+                    <input id="cc" type="text" class="form-control page1" placeholder="usr_nbr" aria-label="usr_nbr"
+                    aria-describedby="basic-addon10">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip" rows="12" class="form-control autocopy" aria-label="SQL"></code>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip2" rows="12" class="form-control autocopy" aria-label="SQL"></code>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <code id="sql_tip3" rows="12" class="form-control autocopy" aria-label="SQL"></code>
+                </div>
+                
+            </div>
+            <div class="col-sm-7">
+                <div class="input-group mb-3">
+                    <input id="me" type="text" class="form-control page1" placeholder="lta" aria-label="lta"
+                    aria-describedby="me">
+                    <span class="input-group-text" id="me">名字</span>
+                </div>
+                <div class="input-group mb-3">
+                    <input id="order_no" type="text" class="form-control page1" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
+                    aria-describedby="basic-addon0">
+                    <span class="input-group-text" id="basic-addon0">单号</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <code id="tip4" rows="12" class="form-control" aria-label="TIP"></code>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">上传</span>
+                    <textarea  id="upload_tip" rows="3" class="form-control" aria-label="上传"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">结果</span>
+                    <textarea id="result" rows="3" class="form-control autocopy" aria-label="结果"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="tip1" rows="3" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="tip2" rows="2" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="page2" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <input id="order_no2" type="text" class="form-control" placeholder="SJXQZC-SZ-21100900006530169425" aria-label="SJXQZC-SZ-21100900006530169425"
+                    aria-describedby="basic-addon0">
+                    <span class="input-group-text" id="basic-addon0">单号</span>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon5">工单描述</span>
+                    <input id="wod" type="text" class="form-control" placeholder="关于提取XXX的需求" aria-label="关于提取XXX的需求"
+                    aria-describedby="basic-addon5">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon6">处理人</span>
+                    <input id="operator" type="text" class="form-control" placeholder="Angle" aria-label="Angle"
+                    aria-describedby="basic-addon6">
+                    <span class="input-group-text" id="basic-addon7">工时(小时)</span>
+                    <input id="workhours" type="text" class="form-control" placeholder="8" aria-label="8"
+                    aria-describedby="basic-addon7">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon8">附件名称</span>
+                    <input id="appendix" type="text" class="form-control" placeholder="result.xlsx" aria-label="result.xlsx"
+                    aria-describedby="basic-addon8">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan1" rows="4" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan2" rows="3" class="form-control" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">TIP</span>
+                    <textarea id="huidan3" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6"></div>
+        </div>
+        <div id="page3" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon31">表名</span>
+                    <input id="page3_tbname" type="text" class="form-control" placeholder="lta_2021_ref" aria-label="lta_2021_ref"
+                    aria-describedby="basic-addon31">
+                    <input type="checkbox" class="btn-check" id="btn-jcfw" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-jcfw">jcfw</label><br>
+                    <input id="page3_odrno" type="text" class="form-control" placeholder="DTS_AB_202205241_2002669560" aria-label="DTS_AB_202205241_2002669560"
+                    aria-describedby="basic-addon32">
+                    <span class="input-group-text" id="basic-addon32">单号</span>
+                    
+                </div>
+<!--                 <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon32">条件</span>
+                    <input id="page3_condition" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon32">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon33">排序</span>
+                    <input id="page3_order" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon33">
+                    <span class="input-group-text" id="basic-addon34">记录数</span>
+                    <input id="page3_rc" type="text" class="form-control" placeholder="10" aria-label="10"
+                    aria-describedby="basic-addon34">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon35">分组</span>
+                    <input id="page3_group" type="text" class="form-control" placeholder="" aria-label=""
+                    aria-describedby="basic-addon35">
+                    <span class="input-group-text" id="basic-addon36">别名</span>
+                    <input id="page3_tablealias" type="text" class="form-control" placeholder="a" aria-label="a"
+                    aria-describedby="basic-addon36">
+                </div> -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text">抽取10条数据</span>
+                    <textarea id="page3_sql1" rows="4" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">抽取5天前的10条数据</span>
+                    <textarea id="page3_sql5" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">抽取2个月前的10条数据</span>
+                    <textarea id="page3_sql6" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">待导入号码</span>
+                    <textarea id="page3_nbr" rows="5" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon37">导入批次（分区）</span>
+                    <input id="page3_batch" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon37">
+                    <span class="input-group-text" id="basic-addon38">字段数</span>
+                    <input id="page3_field_cnt" type="text" class="form-control" placeholder="5" aria-label="5"
+                    aria-describedby="basic-addon38">
+                    <span class="input-group-text" id="basic-addon39">数据分隔符</span>
+                    <input id="page3_field_seperator" type="text" class="form-control" placeholder="|" aria-label="|"
+                    aria-describedby="basic-addon39">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">生成维表</span>
+                    <textarea id="page3_sql4" rows="12" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">查表分区</span>
+                    <textarea id="page3_sql2" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">查看表定义</span>
+                    <textarea id="page3_sql3" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">插入语句</span>
+                    <textarea id="page3_ist_sql" rows="5" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="page4" class="row cc">
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">原始Excel</span>
+                    <textarea id="page4_excel1" rows="19" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span id="save" class="input-group-text" style="text-decoration-line: underline;cursor:pointer">保存</span>
+                    <textarea id="page4_text1" rows="9" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div id="warningmessage" class="alert alert-warning hide">
+                    <strong>数据可能有异常，检查单元格是否包含换行符！</strong>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">数据</span>
+                    <textarea id="page4_text2" rows="9" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="page5" class="row cc">
+            <div class="col-sm-12">
+                <div class="alert alert-success">
+                    将SQL中使用的表 <a id="getTbName" href="#" class="alert-link">提取</a> 出来~
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">SQL</span>
+                    <textarea id="page5_excel1" rows="19" class="form-control" aria-label="tips"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span  class="input-group-text">使用表</span>
+                    <textarea id="page5_text1" rows="9" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">临时表</span>
+                    <textarea id="page5_text2" rows="9" class="form-control autocopy" aria-label="tips"></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="page6" class="row cc">
+            <div class="col-sm-12">
+                <div class="alert alert-success">
+                    Angle的<strong>粘贴板</strong>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">内容</span>
+                    <textarea id="page6_content" rows="19" class="form-control" aria-label="tips"></textarea>
+                    <button id="addClipBoardBtn" type="button" class="btn btn-outline-primary">添加</button>
+                </div>
+            </div>
+            <div id="myClipBoard" class="col-sm-6">
+                <!-- <div class="input-group mb-1">
+                    <button type="button" class="btn btn-outline-danger">删除</button>
+                    <textarea id="page6_text1" rows="1" class="form-control autocopy" aria-label="tips"></textarea>
+                    <button type="button" class="btn btn-outline-primary">复制</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+
 </html>
