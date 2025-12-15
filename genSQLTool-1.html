@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f5f7fb;
             color: #333;
             height: 100vh;
             overflow: hidden;
@@ -28,7 +28,7 @@
         .input-panel {
             width: 40%;
             background-color: white;
-            border-right: 1px solid #dee2e6;
+            border-right: 1px solid #d1d9e6;
             display: flex;
             flex-direction: column;
             padding: 20px;
@@ -37,7 +37,7 @@
         
         .panel-header {
             margin-bottom: 20px;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #4a6fa5;
         }
         
@@ -45,13 +45,6 @@
             font-size: 20px;
             font-weight: 600;
             color: #2c3e50;
-            display: flex;
-            align-items: center;
-        }
-        
-        .panel-title i {
-            margin-right: 8px;
-            color: #4a6fa5;
         }
         
         .panel-subtitle {
@@ -62,13 +55,13 @@
         
         /* 表单样式 */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         
         .form-label {
             display: block;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: #495057;
             font-size: 14px;
         }
@@ -76,16 +69,15 @@
         .form-hint {
             font-size: 12px;
             color: #6c757d;
-            margin-top: 3px;
+            margin-top: 4px;
         }
         
         .form-control {
             width: 100%;
-            padding: 8px 10px;
+            padding: 9px 12px;
             border: 1px solid #ced4da;
             border-radius: 4px;
             font-size: 14px;
-            transition: border-color 0.15s ease-in-out;
         }
         
         .form-control:focus {
@@ -103,7 +95,7 @@
         
         .date-range-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         
         .date-input-wrapper {
@@ -135,18 +127,17 @@
         /* 按钮样式 */
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-top: 20px;
         }
         
         .btn {
-            padding: 8px 16px;
+            padding: 9px 18px;
             border: none;
             border-radius: 4px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
         .btn-primary {
@@ -184,7 +175,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #dee2e6;
         }
         
@@ -192,13 +183,6 @@
             font-size: 20px;
             font-weight: 600;
             color: #2c3e50;
-            display: flex;
-            align-items: center;
-        }
-        
-        .output-title i {
-            margin-right: 8px;
-            color: #28a745;
         }
         
         .output-stats {
@@ -209,7 +193,7 @@
         .copy-btn {
             background-color: #28a745;
             color: white;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border: none;
             border-radius: 4px;
             font-size: 13px;
@@ -225,7 +209,7 @@
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 4px;
-            padding: 15px;
+            padding: 16px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
             line-height: 1.5;
@@ -239,10 +223,10 @@
             background: white;
             border: 1px solid #ced4da;
             border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 1000;
-            width: 200px;
-            padding: 10px;
+            width: 220px;
+            padding: 12px;
             display: none;
         }
         
@@ -254,11 +238,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .picker-year {
             font-weight: 600;
+            font-size: 15px;
         }
         
         .picker-nav {
@@ -267,25 +252,28 @@
             font-size: 16px;
             cursor: pointer;
             color: #495057;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
         }
         
         .picker-nav:hover {
-            color: #4a6fa5;
+            background-color: #f8f9fa;
         }
         
         .month-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 6px;
         }
         
         .month-option {
-            padding: 6px 3px;
+            padding: 8px 4px;
             text-align: center;
             border: 1px solid #e9ecef;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         .month-option:hover {
@@ -297,8 +285,15 @@
             color: white;
         }
         
+        .cache-status {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+            display: none;
+        }
+        
         /* 响应式设计 */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .app-container {
                 flex-direction: column;
                 height: auto;
@@ -323,36 +318,40 @@
         <div class="input-panel">
             <div class="panel-header">
                 <div class="panel-title">⚙️ 输入配置</div>
-                <div class="panel-subtitle">配置表名、参考月份和分表月份范围</div>
+                <div class="panel-subtitle">配置表名、参考月份和分表月份范围（自动保存）</div>
             </div>
             
             <div class="form-group">
-                <label class="form-label">表名（多个表以英文逗号分隔）</label>
-                <textarea id="tableNames" class="form-control" placeholder="例如：EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M">EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M</textarea>
-                <div class="form-hint">多个表名用英文逗号分隔，不要包含月份后缀</div>
+                <label class="form-label">表名（支持从Excel复制，支持换行、Tab、逗号分隔）</label>
+                <textarea id="tableNames" class="form-control" placeholder="从Excel复制表名，支持换行、Tab、逗号分隔"></textarea>
+                <div class="form-hint">支持从Excel按行或列复制，自动识别换行符、制表符、逗号分隔</div>
+                <div id="tableNamesCache" class="cache-status">已保存</div>
             </div>
             
             <div class="form-group">
                 <label class="form-label">参考表月份（已有表的月份）</label>
                 <div class="date-input-wrapper">
-                    <input type="text" id="refMonth" class="form-control" placeholder="点击右侧按钮选择月份" value="202511" readonly>
+                    <input type="text" id="refMonth" class="form-control" placeholder="点击右侧按钮选择月份" readonly>
                     <button class="month-picker-btn" onclick="showMonthPicker('refMonth')">📅</button>
                 </div>
+                <div class="form-hint">默认值为上个月（YYYYMM格式）</div>
+                <div id="refMonthCache" class="cache-status">已保存</div>
             </div>
             
             <div class="form-group">
                 <label class="form-label">分表月份范围</label>
                 <div class="date-range-group">
                     <div class="date-input-wrapper">
-                        <input type="text" id="startMonth" class="form-control" placeholder="开始月份" value="202501" readonly>
+                        <input type="text" id="startMonth" class="form-control" placeholder="开始月份" readonly>
                         <button class="month-picker-btn" onclick="showMonthPicker('startMonth')">📅</button>
                     </div>
                     <div class="date-input-wrapper">
-                        <input type="text" id="endMonth" class="form-control" placeholder="结束月份" value="202512" readonly>
+                        <input type="text" id="endMonth" class="form-control" placeholder="结束月份" readonly>
                         <button class="month-picker-btn" onclick="showMonthPicker('endMonth')">📅</button>
                     </div>
                 </div>
-                <div class="form-hint">选择需要创建的分表月份范围</div>
+                <div class="form-hint">开始月份默认值为上上月所在年份的1月，结束月份默认值为上上个月</div>
+                <div id="dateRangeCache" class="cache-status">已保存</div>
             </div>
             
             <div class="form-group">
@@ -367,10 +366,12 @@
             <div style="margin-top: 20px; font-size: 12px; color: #6c757d;">
                 <p><strong>使用说明：</strong></p>
                 <ul style="padding-left: 15px; margin-top: 5px;">
-                    <li><strong>表名格式：</strong>基础表名，不要包含月份后缀</li>
-                    <li><strong>参考月份：</strong>已有表的月份，新表将参考此表结构创建</li>
-                    <li><strong>月份范围：</strong>需要创建的分表的月份范围</li>
+                    <li><strong>表名格式：</strong>支持从Excel直接复制，自动识别换行符、制表符、逗号分隔</li>
+                    <li><strong>参考月份：</strong>已有表的月份，默认值为上个月（YYYYMM格式）</li>
+                    <li><strong>开始月份：</strong>默认值为上上月所在年份的1月（如上上月为2025年10月，则默认2025年1月）</li>
+                    <li><strong>结束月份：</strong>默认值为上上个月（YYYYMM格式）</li>
                     <li><strong>生成格式：</strong>create table 表名_年月 as (select * from 表名_参考年月 where 1=0);</li>
+                    <li><strong>缓存功能：</strong>所有输入自动保存，下次打开页面自动恢复</li>
                 </ul>
             </div>
         </div>
@@ -409,6 +410,27 @@
         let currentInputId = null;
         const monthPicker = document.getElementById('monthPicker');
         
+        // 获取当前日期的上一个月（格式：YYYYMM）
+        function getLastMonth() {
+            const now = new Date();
+            now.setMonth(now.getMonth() - 1);
+            return now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0');
+        }
+        
+        // 获取上上个月（格式：YYYYMM）
+        function getMonthBeforeLast() {
+            const now = new Date();
+            now.setMonth(now.getMonth() - 2);
+            return now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0');
+        }
+        
+        // 获取上上月所在年份的1月（格式：YYYY01）
+        function getFirstMonthOfYearBeforeLastMonth() {
+            const now = new Date();
+            now.setMonth(now.getMonth() - 2);
+            return now.getFullYear().toString() + '01';
+        }
+        
         // 初始化月份选择器
         function initMonthPicker() {
             const yearSpan = document.getElementById('pickerYear');
@@ -446,6 +468,10 @@
                         // 设置输入框的值
                         if (currentInputId) {
                             document.getElementById(currentInputId).value = selectedMonth;
+                            // 保存到缓存
+                            saveToCache(currentInputId, selectedMonth);
+                            // 显示保存状态
+                            showCacheStatus(currentInputId);
                         }
                         
                         // 关闭月份选择器
@@ -514,13 +540,110 @@
             monthPicker.classList.remove('active');
         }
         
-        // 解析表名字符串
+        // 保存数据到本地存储
+        function saveToCache(key, value) {
+            try {
+                localStorage.setItem(`tablePartition_${key}`, value);
+            } catch (e) {
+                console.error('保存到本地存储失败:', e);
+            }
+        }
+        
+        // 从本地存储加载数据
+        function loadFromCache(key) {
+            try {
+                return localStorage.getItem(`tablePartition_${key}`);
+            } catch (e) {
+                console.error('从本地存储加载失败:', e);
+                return null;
+            }
+        }
+        
+        // 清空缓存
+        function clearCache() {
+            try {
+                localStorage.removeItem('tablePartition_tableNames');
+                localStorage.removeItem('tablePartition_refMonth');
+                localStorage.removeItem('tablePartition_startMonth');
+                localStorage.removeItem('tablePartition_endMonth');
+            } catch (e) {
+                console.error('清空缓存失败:', e);
+            }
+        }
+        
+        // 显示缓存状态
+        function showCacheStatus(elementId) {
+            const cacheElement = document.getElementById(`${elementId}Cache`);
+            if (cacheElement) {
+                cacheElement.style.display = 'block';
+                setTimeout(() => {
+                    cacheElement.style.display = 'none';
+                }, 1500);
+            }
+        }
+        
+        // 初始化表单数据（从缓存加载或使用默认值）
+        function initFormData() {
+            const lastMonth = getLastMonth();
+            const monthBeforeLast = getMonthBeforeLast();
+            const firstMonthOfYearBeforeLastMonth = getFirstMonthOfYearBeforeLastMonth();
+            
+            // 表名
+            const cachedTableNames = loadFromCache('tableNames');
+            if (cachedTableNames) {
+                document.getElementById('tableNames').value = cachedTableNames;
+            } else {
+                document.getElementById('tableNames').value = 'EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M\nEDS.TW_AGILE_GUSR_ATTR_DETAIL_M';
+            }
+            
+            // 参考月份
+            const cachedRefMonth = loadFromCache('refMonth');
+            document.getElementById('refMonth').value = cachedRefMonth || lastMonth;
+            
+            // 开始月份
+            const cachedStartMonth = loadFromCache('startMonth');
+            document.getElementById('startMonth').value = cachedStartMonth || firstMonthOfYearBeforeLastMonth;
+            
+            // 结束月份
+            const cachedEndMonth = loadFromCache('endMonth');
+            document.getElementById('endMonth').value = cachedEndMonth || monthBeforeLast;
+            
+            // 为输入框添加缓存功能
+            document.getElementById('tableNames').addEventListener('input', function() {
+                saveToCache('tableNames', this.value);
+                showCacheStatus('tableNames');
+                updateTableCount();
+            });
+            
+            document.getElementById('refMonth').addEventListener('change', function() {
+                saveToCache('refMonth', this.value);
+                showCacheStatus('refMonth');
+                updateTableCount();
+            });
+            
+            document.getElementById('startMonth').addEventListener('change', function() {
+                saveToCache('startMonth', this.value);
+                showCacheStatus('startMonth');
+                updateTableCount();
+            });
+            
+            document.getElementById('endMonth').addEventListener('change', function() {
+                saveToCache('endMonth', this.value);
+                showCacheStatus('endMonth');
+                updateTableCount();
+            });
+            
+            // 初始更新表数量信息
+            updateTableCount();
+        }
+        
+        // 解析表名字符串（支持换行符、Tab、逗号分隔）
         function parseTableNames(tableNamesText) {
             if (!tableNamesText) return [];
             
-            // 按逗号分割，并清理空白字符
+            // 使用正则表达式分割：换行符、Tab、逗号
             return tableNamesText
-                .split(',')
+                .split(/[\n\t,]+/)
                 .map(name => name.trim())
                 .filter(name => name.length > 0);
         }
@@ -652,9 +775,6 @@
             // 更新结果统计
             document.getElementById('resultStats').textContent = 
                 `${tableNames.length}个表 × ${months.length}个月份 = ${totalTables}个分表`;
-            
-            // 更新表数量信息
-            updateTableCount();
         }
         
         // 复制到剪贴板
@@ -678,20 +798,39 @@
                     copyBtn.style.backgroundColor = "#28a745";
                 }, 2000);
             }).catch(err => {
-                console.error('复制失败: ', err);
+                console.error('复制失败:', err);
                 alert("复制失败，请手动选择文本复制");
             });
         }
         
         // 重置表单
         function resetForm() {
-            document.getElementById('tableNames').value = "EDS.TW_AGILE_GUSR_ATTR_BASE_INF_M, EDS.TW_AGILE_GUSR_ATTR_DETAIL_M";
-            document.getElementById('refMonth').value = "202511";
-            document.getElementById('startMonth').value = "202501";
-            document.getElementById('endMonth').value = "202512";
+            const lastMonth = getLastMonth();
+            const monthBeforeLast = getMonthBeforeLast();
+            const firstMonthOfYearBeforeLastMonth = getFirstMonthOfYearBeforeLastMonth();
+            
+            // 清空缓存
+            clearCache();
+            
+            // 重置表单值
+            document.getElementById('tableNames').value = '';
+            document.getElementById('refMonth').value = lastMonth;
+            document.getElementById('startMonth').value = firstMonthOfYearBeforeLastMonth;
+            document.getElementById('endMonth').value = monthBeforeLast;
+            
+            // 清空结果
             document.getElementById('sqlResult').textContent = "请填写左侧的配置信息，然后点击\"生成建表语句\"按钮";
             document.getElementById('tableCountInfo').textContent = "";
             document.getElementById('resultStats').textContent = "";
+            
+            // 保存重置后的值到缓存
+            saveToCache('tableNames', document.getElementById('tableNames').value);
+            saveToCache('refMonth', lastMonth);
+            saveToCache('startMonth', firstMonthOfYearBeforeLastMonth);
+            saveToCache('endMonth', monthBeforeLast);
+            
+            // 更新表数量信息
+            updateTableCount();
         }
         
         // 页面加载时初始化
@@ -699,20 +838,12 @@
             // 初始化月份选择器
             initMonthPicker();
             
-            // 为表名输入框添加实时计数
-            document.getElementById('tableNames').addEventListener('input', updateTableCount);
-            
-            // 为月份输入框添加实时计数
-            document.getElementById('startMonth').addEventListener('change', updateTableCount);
-            document.getElementById('endMonth').addEventListener('change', updateTableCount);
-            
-            // 自动计算表数量
-            updateTableCount();
+            // 初始化表单数据（从缓存加载或使用默认值）
+            initFormData();
             
             // 自动生成示例SQL
             generateSQL();
         };
     </script>
-    
 </body>
 </html>
