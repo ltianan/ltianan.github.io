@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加班费计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e6ed;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+        
+        .input-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f3f7;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .input-group {
+            margin-bottom: 18px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dce1e8;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .overtime-types {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .type-box {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 18px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .type-box.weekday {
+            border-left-color: #3498db;
+        }
+        
+        .type-box.weekend {
+            border-left-color: #2ecc71;
+        }
+        
+        .type-box.holiday {
+            border-left-color: #e74c3c;
+        }
+        
+        .type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .type-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        
+        .type-multiplier {
+            background-color: #e8f4fc;
+            color: #3498db;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .type-box.weekend .type-multiplier {
+            background-color: #e8f8f0;
+            color: #27ae60;
+        }
+        
+        .type-box.holiday .type-multiplier {
+            background-color: #fdedec;
+            color: #e74c3c;
+        }
+        
+        .hours-input {
+            display: flex;
+            align-items: center;
+        }
+        
+        .hours-input input {
+            flex-grow: 1;
+        }
+        
+        .hours-label {
+            margin-left: 10px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calculate-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .reset-btn {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            border: 1px solid #e0e6ed;
+        }
+        
+        .reset-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .result-box {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed #e0e6ed;
+        }
+        
+        .result-row.total {
+            border-bottom: none;
+            border-top: 2px solid #e0e6ed;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 5px;
+            padding-top: 15px;
+        }
+        
+        .result-label {
+            color: #2c3e50;
+        }
+        
+        .result-value {
+            font-weight: 600;
+        }
+        
+        .type-box.weekday .result-value {
+            color: #3498db;
+        }
+        
+        .type-box.weekend .result-value {
+            color: #27ae60;
+        }
+        
+        .type-box.holiday .result-value {
+            color: #e74c3c;
+        }
+        
+        .total .result-value {
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .summary-box {
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .summary-label {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #bdc3c7;
+        }
+        
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+        
+        .summary-note {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            color: #95a5a6;
+        }
+        
+        .formula-section {
+            grid-column: 1 / -1;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .formulas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .formula-box {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 18px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .formula-box:nth-child(2) {
+            border-left-color: #2ecc71;
+        }
+        
+        .formula-box:nth-child(3) {
+            border-left-color: #e74c3c;
+        }
+        
+        .formula-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .formula-text {
+            background-color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            margin-top: 8px;
+            border: 1px dashed #e0e6ed;
+        }
+        
+        .note-box {
+            background-color: #fff9e6;
+            border-left: 4px solid #f1c40f;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            color: #d35400;
+            margin-bottom: 5px;
+        }
+        
+        .explanation {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            color: #95a5a6;
+            font-size: 0.85rem;
+            border-top: 1px solid #e0e6ed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>加班费计算器</h1>
+            <p class="subtitle">根据劳动法规定计算您的加班费 | 一次计算全部加班类型</p>
+        </div>
+        
+        <div class="input-section">
+            <h2 class="section-title">
+                <i class="fas fa-edit" style="font-family: 'Font Awesome 5 Free';">✎</i> 输入加班信息
+            </h2>
+            
+            <div class="input-group">
+                <label for="salary">月基本工资（元）</label>
+                <input type="number" id="salary" placeholder="例如：8000" min="0" step="100" value="8000">
+            </div>
+            
+            <div class="overtime-types">
+                <div class="type-box weekday">
+                    <div class="type-header">
+                        <div class="type-title">工作日加班</div>
+                        <div class="type-multiplier">1.5倍工资</div>
+                    </div>
+                    <div class="hours-input">
+                        <input type="number" id="weekday-hours" placeholder="加班小时数" min="0" step="0.5" value="0">
+                        <div class="hours-label">小时</div>
+                    </div>
+                    <div class="explanation">正常工作日延长工作时间（周一至周五）</div>
+                </div>
+                
+                <div class="type-box weekend">
+                    <div class="type-header">
+                        <div class="type-title">休息日加班</div>
+                        <div class="type-multiplier">2倍工资</div>
+                    </div>
+                    <div class="hours-input">
+                        <input type="number" id="weekend-hours" placeholder="加班小时数" min="0" step="0.5" value="0">
+                        <div class="hours-label">小时</div>
+                    </div>
+                    <div class="explanation">周六、周日（不能安排补休的情况）</div>
+                </div>
+                
+                <div class="type-box holiday">
+                    <div class="type-header">
+                        <div class="type-title">节假日加班</div>
+                        <div class="type-multiplier">3倍工资</div>
+                    </div>
+                    <div class="hours-input">
+                        <input type="number" id="holiday-hours" placeholder="加班小时数" min="0" step="0.5" value="0">
+                        <div class="hours-label">小时</div>
+                    </div>
+                    <div class="explanation">法定节假日（春节、国庆等，共11天）</div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="calculate-btn" id="calculateBtn">计算加班费</button>
+                <button class="reset-btn" id="resetBtn">重置</button>
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar" style="font-family: 'Font Awesome 5 Free';">📊</i> 计算结果
+            </h2>
+            
+            <div class="result-box">
+                <div class="result-row">
+                    <div class="result-label">小时工资</div>
+                    <div class="result-value" id="hourly-wage">0.00 元/小时</div>
+                </div>
+                
+                <div class="result-row weekday">
+                    <div class="result-label">工作日加班费</div>
+                    <div class="result-value" id="weekday-pay">0.00 元</div>
+                </div>
+                
+                <div class="result-row weekend">
+                    <div class="result-label">休息日加班费</div>
+                    <div class="result-value" id="weekend-pay">0.00 元</div>
+                </div>
+                
+                <div class="result-row holiday">
+                    <div class="result-label">节假日加班费</div>
+                    <div class="result-value" id="holiday-pay">0.00 元</div>
+                </div>
+                
+                <div class="result-row total">
+                    <div class="result-label">加班费合计</div>
+                    <div class="result-value" id="total-pay">0.00 元</div>
+                </div>
+            </div>
+            
+            <div class="summary-box">
+                <div class="summary-label">您应得的加班费总计</div>
+                <div class="summary-value" id="summary-total">0.00 元</div>
+                <div class="summary-note">计算结果仅供参考，实际发放以公司规定为准</div>
+            </div>
+        </div>
+        
+        <div class="formula-section">
+            <h2 class="section-title">
+                <i class="fas fa-calculator" style="font-family: 'Font Awesome 5 Free';">🧮</i> 计算公式
+            </h2>
+            
+            <div class="formulas-grid">
+                <div class="formula-box">
+                    <div class="formula-title">小时工资计算</div>
+                    <p>月计薪天数：21.75天（根据《劳动法》规定）</p>
+                    <div class="formula-text">小时工资 = 月工资 ÷ 21.75 ÷ 8</div>
+                </div>
+                
+                <div class="formula-box">
+                    <div class="formula-title">工作日加班费</div>
+                    <p>工作日延长工作时间的加班费计算</p>
+                    <div class="formula-text">工作日加班费 = 小时工资 × 小时数 × 150%</div>
+                </div>
+                
+                <div class="formula-box">
+                    <div class="formula-title">节假日加班费</div>
+                    <p>法定节假日安排工作的加班费计算</p>
+                    <div class="formula-text">节假日加班费 = 小时工资 × 小时数 × 300%</div>
+                </div>
+            </div>
+            
+            <div class="note-box">
+                <div class="note-title">法定节假日说明</div>
+                <p>根据《劳动法》规定，法定节假日包括：元旦1天、春节3天、清明节1天、劳动节1天、端午节1天、中秋节1天、国庆节3天，共11天。法定节假日加班支付3倍工资，且不能以补休代替。</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 加班费计算器 | 根据《中华人民共和国劳动法》相关规定计算 | 数据仅供参考</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const salaryInput = document.getElementById('salary');
+            const weekdayHoursInput = document.getElementById('weekday-hours');
+            const weekendHoursInput = document.getElementById('weekend-hours');
+            const holidayHoursInput = document.getElementById('holiday-hours');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            // 结果元素
+            const hourlyWageEl = document.getElementById('hourly-wage');
+            const weekdayPayEl = document.getElementById('weekday-pay');
+            const weekendPayEl = document.getElementById('weekend-pay');
+            const holidayPayEl = document.getElementById('holiday-pay');
+            const totalPayEl = document.getElementById('total-pay');
+            const summaryTotalEl = document.getElementById('summary-total');
+            
+            // 初始化计算
+            calculateOvertime();
+            
+            // 计算按钮点击事件
+            calculateBtn.addEventListener('click', calculateOvertime);
+            
+            // 重置按钮点击事件
+            resetBtn.addEventListener('click', function() {
+                salaryInput.value = '';
+                weekdayHoursInput.value = 0;
+                weekendHoursInput.value = 0;
+                holidayHoursInput.value = 0;
+                calculateOvertime();
+            });
+            
+            // 输入框变化时实时计算
+            salaryInput.addEventListener('input', calculateOvertime);
+            weekdayHoursInput.addEventListener('input', calculateOvertime);
+            weekendHoursInput.addEventListener('input', calculateOvertime);
+            holidayHoursInput.addEventListener('input', calculateOvertime);
+            
+            // 加班费计算函数
+            function calculateOvertime() {
+                // 获取输入值
+                const salary = parseFloat(salaryInput.value) || 0;
+                const weekdayHours = parseFloat(weekdayHoursInput.value) || 0;
+                const weekendHours = parseFloat(weekendHoursInput.value) || 0;
+                const holidayHours = parseFloat(holidayHoursInput.value) || 0;
+                
+                // 计算小时工资
+                const hourlyWage = salary / 21.75 / 8;
+                
+                // 计算各类加班费
+                const weekdayPay = hourlyWage * weekdayHours * 1.5;
+                const weekendPay = hourlyWage * weekendHours * 2.0;
+                const holidayPay = hourlyWage * holidayHours * 3.0;
+                
+                // 计算合计
+                const totalPay = weekdayPay + weekendPay + holidayPay;
+                
+                // 更新显示
+                hourlyWageEl.textContent = isNaN(hourlyWage) ? '0.00 元/小时' : hourlyWage.toFixed(2) + ' 元/小时';
+                weekdayPayEl.textContent = weekdayPay.toFixed(2) + ' 元';
+                weekendPayEl.textContent = weekendPay.toFixed(2) + ' 元';
+                holidayPayEl.textContent = holidayPay.toFixed(2) + ' 元';
+                totalPayEl.textContent = totalPay.toFixed(2) + ' 元';
+                summaryTotalEl.textContent = totalPay.toFixed(2) + ' 元';
+            }
+        });
+    </script>
+</body>
+</html>
