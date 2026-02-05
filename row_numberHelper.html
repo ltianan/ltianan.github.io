@@ -160,11 +160,6 @@
             transform: translateY(0);
         }
         
-        .load-btn {
-            width: 100%;
-            margin-top: 15px;
-        }
-        
         .fields-list {
             flex: 1;
             overflow-y: auto;
@@ -287,6 +282,20 @@
             margin-top: 6px;
         }
         
+        .auto-load-hint {
+            font-size: 0.85rem;
+            color: #2ecc71;
+            font-weight: 600;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .auto-load-hint i {
+            font-size: 1rem;
+        }
+        
         .notification {
             position: fixed;
             bottom: 20px;
@@ -373,7 +382,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-table"></i> 表字段管理工具</h1>
-            <p class="subtitle">输入表别名和多行字段名，快速生成、管理和复制SQL字段</p>
+            <p class="subtitle">输入表别名和多行字段名，自动生成、管理和复制SQL字段</p>
         </header>
         
         <div class="main-content">
@@ -389,12 +398,11 @@
                     <div class="input-field-group" style="flex: 1; display: flex; flex-direction: column;">
                         <label for="field-input"><i class="fas fa-key"></i> 字段列表（每行一个字段）</label>
                         <textarea id="field-input" placeholder="在此输入字段名称，每行一个字段"></textarea>
-                        <p class="input-hint">每行输入一个字段名称，点击加载按钮替换输出区域</p>
+                        <p class="input-hint">每行输入一个字段名称，输入内容会自动加载到输出区域</p>
+                        <div class="auto-load-hint">
+                            <i class="fas fa-sync-alt"></i> 自动加载已启用
+                        </div>
                     </div>
-                    
-                    <button id="load-btn" class="load-btn">
-                        <i class="fas fa-upload"></i> 加载字段到输出区域
-                    </button>
                 </div>
             </div>
             
@@ -406,7 +414,7 @@
                     <div class="fields-list" id="fields-container">
                         <div class="no-fields" id="no-fields-message">
                             <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 12px; display: block; color: #bdc3c7;"></i>
-                            <p>暂无字段，请在左侧输入字段并加载</p>
+                            <p>暂无字段，请在左侧输入字段</p>
                         </div>
                     </div>
                     
@@ -433,7 +441,6 @@
             // 获取DOM元素
             const aliasInput = document.getElementById('alias-input');
             const fieldInput = document.getElementById('field-input');
-            const loadBtn = document.getElementById('load-btn');
             const fieldsContainer = document.getElementById('fields-container');
             const noFieldsMessage = document.getElementById('no-fields-message');
             const copyAllBtn = document.getElementById('copy-all-btn');
@@ -444,14 +451,29 @@
             // 存储字段的数组
             let fields = [];
             
+            // 防抖计时器
+            let debounceTimer = null;
+            
             // 从localStorage加载已保存的字段
             loadFieldsFromStorage();
             
-            // 加载按钮点击事件
-            loadBtn.addEventListener('click', loadFields);
-            
             // 复制所有字段按钮点击事件
             copyAllBtn.addEventListener('click', copyAllFields);
+            
+            // 为输入框添加输入事件监听
+            aliasInput.addEventListener('input', handleInputChange);
+            fieldInput.addEventListener('input', handleInputChange);
+            
+            // 输入变化处理函数（防抖）
+            function handleInputChange() {
+                // 清除之前的计时器
+                if (debounceTimer) {
+                    clearTimeout(debounceTimer);
+                }
+                
+                // 设置新的计时器，延迟500ms执行加载
+                debounceTimer = setTimeout(loadFields, 500);
+            }
             
             // 加载字段函数
             function loadFields() {
@@ -460,14 +482,12 @@
                 
                 // 验证输入
                 if (!alias) {
-                    showNotification('请输入表别名！', true);
-                    aliasInput.focus();
+                    // 表别名为空时不执行加载
                     return;
                 }
                 
                 if (!fieldText) {
-                    showNotification('请输入字段名！', true);
-                    fieldInput.focus();
+                    // 字段列表为空时不执行加载
                     return;
                 }
                 
@@ -480,7 +500,7 @@
                     .filter(field => field !== '');
                 
                 if (fieldNames.length === 0) {
-                    showNotification('请输入有效的字段名！', true);
+                    // 没有有效字段时不执行加载
                     return;
                 }
                 
@@ -506,16 +526,13 @@
                 // 更新UI
                 updateFieldsList();
                 
-                // 注意：不再清空输入框，保留输入内容
-                aliasInput.focus();
-                
                 // 保存到localStorage
                 saveFieldsToStorage();
                 
                 // 显示成功通知
                 const message = addedCount > 1 ? 
-                    `已加载 ${addedCount} 个字段到输出区域！` : 
-                    `字段 ${aliasUpper}.${fieldNames[0]} 已加载！`;
+                    `已自动加载 ${addedCount} 个字段到输出区域！` : 
+                    `字段 ${aliasUpper}.${fieldNames[0]} 已自动加载！`;
                 showNotification(message);
             }
             
