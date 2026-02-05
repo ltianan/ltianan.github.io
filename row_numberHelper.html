@@ -16,8 +16,8 @@
         body {
             background-color: #f5f7fa;
             color: #333;
-            line-height: 1.6;
-            padding: 20px;
+            line-height: 1.5;
+            padding: 15px;
             min-height: 100vh;
         }
         
@@ -25,58 +25,65 @@
             max-width: 1200px;
             margin: 0 auto;
             background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
         }
         
         header {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
-            padding: 30px 40px;
+            padding: 20px 30px;
             text-align: center;
+            flex-shrink: 0;
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
         }
         
         h1 i {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.9;
             font-weight: 300;
         }
         
         .main-content {
             display: flex;
-            padding: 40px;
-            gap: 40px;
+            padding: 20px;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
         }
         
         .section {
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
         
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #f0f2f5;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .section-title i {
@@ -85,37 +92,40 @@
         
         .input-container, .output-container {
             background-color: #f9fafc;
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 10px;
+            padding: 20px;
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
         
         .input-field-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: #444;
+            font-size: 0.95rem;
         }
         
         input, textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 2px solid #e1e5eb;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             transition: all 0.3s;
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
         
         textarea {
-            min-height: 300px;
+            min-height: 150px;
             resize: vertical;
+            flex: 1;
         }
         
         input:focus, textarea:focus {
@@ -125,19 +135,19 @@
         }
         
         button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background-color: #6a11cb;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         button:hover {
@@ -152,21 +162,21 @@
         
         .load-btn {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .fields-list {
             flex: 1;
             overflow-y: auto;
-            max-height: 400px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            min-height: 0;
         }
         
         .no-fields {
             text-align: center;
             color: #95a5a6;
             font-style: italic;
-            padding: 40px 20px;
+            padding: 30px 15px;
         }
         
         .field-item {
@@ -174,40 +184,40 @@
             align-items: center;
             justify-content: space-between;
             background-color: white;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-            border-left: 4px solid #6a11cb;
-            transition: all 0.3s;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            border-left: 3px solid #6a11cb;
+            transition: all 0.2s;
         }
         
         .field-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
         }
         
         .field-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         
         .field-index {
             background-color: #6a11cb;
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .field-text {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 500;
         }
         
@@ -222,13 +232,13 @@
         
         .field-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         
         .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -250,14 +260,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
+            padding-top: 15px;
             border-top: 2px solid #f0f2f5;
         }
         
         .copy-all-btn {
             background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-            padding: 14px 30px;
-            font-size: 1.1rem;
+            padding: 12px 24px;
+            font-size: 1rem;
         }
         
         .copy-all-btn:hover {
@@ -268,27 +278,27 @@
         .field-count {
             font-weight: 600;
             color: #6a11cb;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .input-hint {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #7f8c8d;
-            margin-top: 8px;
+            margin-top: 6px;
         }
         
         .notification {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            right: 20px;
             background-color: #2ecc71;
             color: white;
-            padding: 16px 22px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -305,20 +315,20 @@
         }
         
         .notification i {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
         
         .divider {
             width: 1px;
             background-color: #f0f2f5;
-            margin: 0 20px;
+            margin: 0 15px;
         }
         
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
-                padding: 25px;
-                gap: 30px;
+                padding: 15px;
+                gap: 20px;
             }
             
             .divider {
@@ -326,13 +336,13 @@
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.6rem;
             }
             
             .field-item {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
+                gap: 10px;
             }
             
             .field-actions {
@@ -341,8 +351,20 @@
             
             .output-controls {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
                 align-items: stretch;
+            }
+            
+            .container {
+                height: auto;
+                min-height: 95vh;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .container {
+                height: auto;
+                min-height: 95vh;
             }
         }
     </style>
@@ -364,7 +386,7 @@
                         <p class="input-hint">输入表的别名，会自动转为大写字母</p>
                     </div>
                     
-                    <div class="input-field-group">
+                    <div class="input-field-group" style="flex: 1; display: flex; flex-direction: column;">
                         <label for="field-input"><i class="fas fa-key"></i> 字段列表（每行一个字段）</label>
                         <textarea id="field-input" placeholder="在此输入字段名称，每行一个字段"></textarea>
                         <p class="input-hint">每行输入一个字段名称，点击加载按钮替换输出区域</p>
@@ -383,7 +405,7 @@
                 <div class="output-container">
                     <div class="fields-list" id="fields-container">
                         <div class="no-fields" id="no-fields-message">
-                            <i class="fas fa-info-circle" style="font-size: 2.5rem; margin-bottom: 15px; display: block; color: #bdc3c7;"></i>
+                            <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 12px; display: block; color: #bdc3c7;"></i>
                             <p>暂无字段，请在左侧输入字段并加载</p>
                         </div>
                     </div>
