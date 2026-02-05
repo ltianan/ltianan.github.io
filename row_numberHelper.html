@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表字段管理工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        h1 i {
+            font-size: 2.8rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 40px;
+            gap: 40px;
+        }
+        
+        .section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #6a11cb;
+        }
+        
+        .input-container, .output-container {
+            background-color: #f9fafc;
+            border-radius: 12px;
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-field-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        textarea {
+            min-height: 300px;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+            outline: none;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #5a0db3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .load-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .fields-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .no-fields {
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        .field-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #6a11cb;
+            transition: all 0.3s;
+        }
+        
+        .field-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .field-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .field-index {
+            background-color: #6a11cb;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .field-text {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .alias {
+            color: #6a11cb;
+            font-weight: 700;
+        }
+        
+        .field-name {
+            color: #2c3e50;
+        }
+        
+        .field-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .delete-btn {
+            background-color: #ffeaea;
+            color: #e74c3c;
+        }
+        
+        .delete-btn:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .output-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 2px solid #f0f2f5;
+        }
+        
+        .copy-all-btn {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            padding: 14px 30px;
+            font-size: 1.1rem;
+        }
+        
+        .copy-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.25);
+        }
+        
+        .field-count {
+            font-weight: 600;
+            color: #6a11cb;
+            font-size: 1.2rem;
+        }
+        
+        .input-hint {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #2ecc71;
+            color: white;
+            padding: 16px 22px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            background-color: #e74c3c;
+        }
+        
+        .notification i {
+            font-size: 1.3rem;
+        }
+        
+        .divider {
+            width: 1px;
+            background-color: #f0f2f5;
+            margin: 0 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 25px;
+                gap: 30px;
+            }
+            
+            .divider {
+                display: none;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .field-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .field-actions {
+                align-self: flex-end;
+            }
+            
+            .output-controls {
+                flex-direction: column;
+                gap: 20px;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-table"></i> 表字段管理工具</h1>
+            <p class="subtitle">输入表别名和多行字段名，快速生成、管理和复制SQL字段</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-arrow-right-to-bracket"></i> 输入区域</h2>
+                <div class="input-container">
+                    <div class="input-field-group">
+                        <label for="alias-input"><i class="fas fa-tag"></i> 表别名</label>
+                        <input type="text" id="alias-input" placeholder="例如: user, order, product">
+                        <p class="input-hint">输入表的别名，会自动转为大写字母</p>
+                    </div>
+                    
+                    <div class="input-field-group">
+                        <label for="field-input"><i class="fas fa-key"></i> 字段列表（每行一个字段）</label>
+                        <textarea id="field-input" placeholder="在此输入字段名称，每行一个字段"></textarea>
+                        <p class="input-hint">每行输入一个字段名称，点击加载按钮替换输出区域</p>
+                    </div>
+                    
+                    <button id="load-btn" class="load-btn">
+                        <i class="fas fa-upload"></i> 加载字段到输出区域
+                    </button>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-table-cells"></i> 输出区域</h2>
+                <div class="output-container">
+                    <div class="fields-list" id="fields-container">
+                        <div class="no-fields" id="no-fields-message">
+                            <i class="fas fa-info-circle" style="font-size: 2.5rem; margin-bottom: 15px; display: block; color: #bdc3c7;"></i>
+                            <p>暂无字段，请在左侧输入字段并加载</p>
+                        </div>
+                    </div>
+                    
+                    <div class="output-controls">
+                        <div>
+                            <p>字段总数: <span class="field-count" id="field-count">0</span></p>
+                        </div>
+                        <button id="copy-all-btn" class="copy-all-btn">
+                            <i class="fas fa-copy"></i> 复制所有字段
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">字段已加载到输出区域！</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const aliasInput = document.getElementById('alias-input');
+            const fieldInput = document.getElementById('field-input');
+            const loadBtn = document.getElementById('load-btn');
+            const fieldsContainer = document.getElementById('fields-container');
+            const noFieldsMessage = document.getElementById('no-fields-message');
+            const copyAllBtn = document.getElementById('copy-all-btn');
+            const fieldCount = document.getElementById('field-count');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            // 存储字段的数组
+            let fields = [];
+            
+            // 从localStorage加载已保存的字段
+            loadFieldsFromStorage();
+            
+            // 加载按钮点击事件
+            loadBtn.addEventListener('click', loadFields);
+            
+            // 复制所有字段按钮点击事件
+            copyAllBtn.addEventListener('click', copyAllFields);
+            
+            // 加载字段函数
+            function loadFields() {
+                const alias = aliasInput.value.trim();
+                const fieldText = fieldInput.value.trim();
+                
+                // 验证输入
+                if (!alias) {
+                    showNotification('请输入表别名！', true);
+                    aliasInput.focus();
+                    return;
+                }
+                
+                if (!fieldText) {
+                    showNotification('请输入字段名！', true);
+                    fieldInput.focus();
+                    return;
+                }
+                
+                // 表别名转为大写
+                const aliasUpper = alias.toUpperCase();
+                
+                // 按行分割字段，过滤空行和空白字符
+                const fieldNames = fieldText.split('\n')
+                    .map(field => field.trim())
+                    .filter(field => field !== '');
+                
+                if (fieldNames.length === 0) {
+                    showNotification('请输入有效的字段名！', true);
+                    return;
+                }
+                
+                // 清空原来的字段数组
+                fields = [];
+                
+                // 统计添加的字段数量
+                let addedCount = 0;
+                
+                // 为每个字段名创建字段对象
+                fieldNames.forEach(fieldName => {
+                    const newField = {
+                        id: Date.now() + Math.random(),
+                        alias: aliasUpper,
+                        name: fieldName,
+                        fullText: `${aliasUpper}.${fieldName}`
+                    };
+                    
+                    fields.push(newField);
+                    addedCount++;
+                });
+                
+                // 更新UI
+                updateFieldsList();
+                
+                // 注意：不再清空输入框，保留输入内容
+                aliasInput.focus();
+                
+                // 保存到localStorage
+                saveFieldsToStorage();
+                
+                // 显示成功通知
+                const message = addedCount > 1 ? 
+                    `已加载 ${addedCount} 个字段到输出区域！` : 
+                    `字段 ${aliasUpper}.${fieldNames[0]} 已加载！`;
+                showNotification(message);
+            }
+            
+            // 更新字段列表显示
+            function updateFieldsList() {
+                // 更新字段计数
+                fieldCount.textContent = fields.length;
+                
+                // 如果没有字段，显示提示信息
+                if (fields.length === 0) {
+                    noFieldsMessage.style.display = 'block';
+                    return;
+                }
+                
+                // 隐藏"无字段"提示
+                noFieldsMessage.style.display = 'none';
+                
+                // 清空容器
+                fieldsContainer.innerHTML = '';
+                
+                // 为每个字段创建DOM元素
+                fields.forEach((field, index) => {
+                    const fieldElement = document.createElement('div');
+                    fieldElement.className = 'field-item';
+                    fieldElement.dataset.id = field.id;
+                    
+                    fieldElement.innerHTML = `
+                        <div class="field-info">
+                            <div class="field-index">${index + 1}</div>
+                            <div class="field-text">
+                                <span class="alias">${field.alias}.</span>
+                                <span class="field-name">${field.name}</span>
+                            </div>
+                        </div>
+                        <div class="field-actions">
+                            <div class="action-btn delete-btn" title="删除此字段">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 添加到容器
+                    fieldsContainer.appendChild(fieldElement);
+                    
+                    // 添加删除按钮事件
+                    const deleteBtn = fieldElement.querySelector('.delete-btn');
+                    deleteBtn.addEventListener('click', () => deleteField(field.id));
+                });
+            }
+            
+            // 删除字段
+            function deleteField(id) {
+                // 从数组中删除对应字段
+                const fieldToDelete = fields.find(field => field.id === id);
+                fields = fields.filter(field => field.id !== id);
+                
+                // 更新UI
+                updateFieldsList();
+                
+                // 保存到localStorage
+                saveFieldsToStorage();
+                
+                // 显示通知
+                showNotification(`已删除字段 ${fieldToDelete.alias}.${fieldToDelete.name}`);
+            }
+            
+            // 复制所有字段
+            function copyAllFields() {
+                if (fields.length === 0) {
+                    showNotification('没有字段可复制！', true);
+                    return;
+                }
+                
+                // 生成字段字符串，每行一个字段，不使用逗号分隔
+                const allFieldsText = fields.map(field => field.fullText).join('\n');
+                
+                // 复制到剪贴板
+                navigator.clipboard.writeText(allFieldsText)
+                    .then(() => {
+                        showNotification(`已复制 ${fields.length} 个字段到剪贴板！`);
+                    })
+                    .catch(err => {
+                        console.error('复制失败: ', err);
+                        
+                        // 备用方法：使用textarea
+                        const textArea = document.createElement('textarea');
+                        textArea.value = allFieldsText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        showNotification(`已复制 ${fields.length} 个字段到剪贴板！`);
+                    });
+            }
+            
+            // 显示通知
+            function showNotification(message, isError = false) {
+                notificationText.textContent = message;
+                
+                if (isError) {
+                    notification.className = 'notification error';
+                } else {
+                    notification.className = 'notification';
+                }
+                
+                notification.classList.add('show');
+                
+                // 3秒后隐藏通知
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // 保存字段到localStorage
+            function saveFieldsToStorage() {
+                localStorage.setItem('tableFields', JSON.stringify(fields));
+            }
+            
+            // 从localStorage加载字段
+            function loadFieldsFromStorage() {
+                const savedFields = localStorage.getItem('tableFields');
+                if (savedFields) {
+                    try {
+                        fields = JSON.parse(savedFields);
+                        updateFieldsList();
+                    } catch (e) {
+                        console.error('加载保存的字段时出错:', e);
+                        fields = [];
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
