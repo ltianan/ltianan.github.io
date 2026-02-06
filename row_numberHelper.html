@@ -123,7 +123,7 @@
         }
         
         textarea {
-            min-height: 150px;
+            min-height: 120px;
             resize: vertical;
             flex: 1;
         }
@@ -333,6 +333,25 @@
             margin: 0 15px;
         }
         
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #6a11cb;
+        }
+        
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -368,6 +387,11 @@
                 height: auto;
                 min-height: 95vh;
             }
+            
+            .stats {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
         
         @media (max-height: 700px) {
@@ -395,12 +419,33 @@
                         <p class="input-hint">输入表的别名，会自动转为大写字母。不输入则只显示字段名</p>
                     </div>
                     
+                    <div class="input-field-group">
+                        <label for="exclude-input"><i class="fas fa-filter"></i> 排除字段（用空格或逗号分隔）</label>
+                        <input type="text" id="exclude-input" placeholder="例如: id, create_time, update_time（可不填）">
+                        <p class="input-hint">输入要排除的字段名，用空格或逗号分隔。自动忽略SQL保留字（如PARTITION BY, ORDER BY等）</p>
+                    </div>
+                    
                     <div class="input-field-group" style="flex: 1; display: flex; flex-direction: column;">
                         <label for="field-input"><i class="fas fa-key"></i> 字段列表（每行一个字段）</label>
                         <textarea id="field-input" placeholder="在此输入字段名称，每行一个字段"></textarea>
                         <p class="input-hint">每行输入一个字段名称，输入内容会自动加载到输出区域</p>
                         <div class="auto-load-hint">
                             <i class="fas fa-sync-alt"></i> 自动加载已启用
+                        </div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span>输入字段数:</span>
+                            <span class="stat-value" id="input-field-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>排除字段数:</span>
+                            <span class="stat-value" id="exclude-field-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>过滤后字段数:</span>
+                            <span class="stat-value" id="filtered-field-count">0</span>
                         </div>
                     </div>
                 </div>
@@ -440,11 +485,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 获取DOM元素
             const aliasInput = document.getElementById('alias-input');
+            const excludeInput = document.getElementById('exclude-input');
             const fieldInput = document.getElementById('field-input');
             const fieldsContainer = document.getElementById('fields-container');
             const noFieldsMessage = document.getElementById('no-fields-message');
             const copyAllBtn = document.getElementById('copy-all-btn');
             const fieldCount = document.getElementById('field-count');
+            const inputFieldCount = document.getElementById('input-field-count');
+            const excludeFieldCount = document.getElementById('exclude-field-count');
+            const filteredFieldCount = document.getElementById('filtered-field-count');
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notification-text');
             
@@ -454,6 +503,19 @@
             // 防抖计时器
             let debounceTimer = null;
             
+            // SQL保留字列表（忽略大小写）
+            const sqlReservedWords = [
+                'PARTITION BY', 'ORDER BY', 'ROW_NUMBER', 'DESC', 'ASC', 
+                'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'LIMIT',
+                'OFFSET', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
+                'FULL JOIN', 'ON', 'AS', 'DISTINCT', 'UNION', 'UNION ALL',
+                'EXISTS', 'IN', 'NOT IN', 'BETWEEN', 'LIKE', 'IS NULL',
+                'IS NOT NULL', 'AND', 'OR', 'NOT', 'CASE', 'WHEN', 'THEN',
+                'ELSE', 'END', 'OVER', 'RANK', 'DENSE_RANK', 'LEAD', 'LAG',
+                'FIRST_VALUE', 'LAST_VALUE', 'COUNT', 'SUM', 'AVG', 'MIN',
+                'MAX', 'CAST', 'CONVERT', 'COALESCE', 'NULLIF'
+            ];
+            
             // 从localStorage加载已保存的字段
             loadFieldsFromStorage();
             
@@ -462,6 +524,7 @@
             
             // 为输入框添加输入事件监听
             aliasInput.addEventListener('input', handleInputChange);
+            excludeInput.addEventListener('input', handleInputChange);
             fieldInput.addEventListener('input', handleInputChange);
             
             // 输入变化处理函数（防抖）
@@ -475,10 +538,34 @@
                 debounceTimer = setTimeout(loadFields, 500);
             }
             
+            // 解析排除字段输入
+            function parseExcludeFields(excludeText) {
+                if (!excludeText.trim()) {
+                    return [];
+                }
+                
+                // 将SQL保留字替换为空字符串（不区分大小写）
+                let cleanedText = excludeText.toUpperCase();
+                sqlReservedWords.forEach(reserved => {
+                    const regex = new RegExp(reserved.toUpperCase(), 'gi');
+                    cleanedText = cleanedText.replace(regex, '');
+                });
+                
+                // 按逗号或空格分割，过滤空值
+                const excludeFields = cleanedText
+                    .split(/[\s,]+/)
+                    .map(field => field.trim())
+                    .filter(field => field !== '')
+                    .map(field => field.toLowerCase());
+                
+                return excludeFields;
+            }
+            
             // 加载字段函数
             function loadFields() {
                 const alias = aliasInput.value.trim();
                 const fieldText = fieldInput.value.trim();
+                const excludeText = excludeInput.value.trim();
                 
                 // 验证输入
                 if (!fieldText) {
@@ -499,14 +586,28 @@
                     return;
                 }
                 
+                // 解析排除字段
+                const excludeFields = parseExcludeFields(excludeText);
+                
+                // 更新输入统计
+                inputFieldCount.textContent = fieldNames.length;
+                excludeFieldCount.textContent = excludeFields.length;
+                
                 // 清空原来的字段数组
                 fields = [];
                 
                 // 统计添加的字段数量
                 let addedCount = 0;
+                let filteredCount = 0;
                 
-                // 为每个字段名创建字段对象
+                // 为每个字段名创建字段对象（排除指定的字段）
                 fieldNames.forEach(fieldName => {
+                    // 检查字段是否在排除列表中（不区分大小写）
+                    if (excludeFields.includes(fieldName.toLowerCase())) {
+                        filteredCount++;
+                        return; // 跳过排除的字段
+                    }
+                    
                     const newField = {
                         id: Date.now() + Math.random(),
                         alias: aliasUpper,
@@ -519,6 +620,9 @@
                     addedCount++;
                 });
                 
+                // 更新过滤后字段数
+                filteredFieldCount.textContent = addedCount;
+                
                 // 更新UI
                 updateFieldsList();
                 
@@ -526,9 +630,10 @@
                 saveFieldsToStorage();
                 
                 // 显示成功通知
-                const message = addedCount > 1 ? 
-                    `已自动加载 ${addedCount} 个字段到输出区域！` : 
-                    `字段 ${aliasUpper ? aliasUpper + '.' + fieldNames[0] : fieldNames[0]} 已自动加载！`;
+                let message = `已自动加载 ${addedCount} 个字段到输出区域！`;
+                if (filteredCount > 0) {
+                    message += ` 过滤了 ${filteredCount} 个字段。`;
+                }
                 showNotification(message);
             }
             
