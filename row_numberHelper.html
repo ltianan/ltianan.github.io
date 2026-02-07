@@ -225,6 +225,11 @@
             color: #2c3e50;
         }
         
+        .field-alias {
+            color: #2ecc71;
+            font-style: italic;
+        }
+        
         .field-actions {
             display: flex;
             gap: 6px;
@@ -421,14 +426,16 @@
                     
                     <div class="input-field-group">
                         <label for="exclude-input"><i class="fas fa-filter"></i> 排除字段（用空格或逗号分隔）</label>
-                        <input type="text" id="exclude-input" placeholder="例如: id, create_time, update_time（可不填）">
-                        <p class="input-hint">输入要排除的字段名，用空格或逗号分隔。自动忽略SQL保留字（如PARTITION BY, ORDER BY等）</p>
+                        <input type="text" id="exclude-input" placeholder="例如: id, create_time, USER.id, ORDER.create_time（可不填）">
+                        <p class="input-hint">输入要排除的字段名，用空格或逗号分隔。可输入"字段名"或"表别名.字段名"</p>
                     </div>
                     
                     <div class="input-field-group" style="flex: 1; display: flex; flex-direction: column;">
-                        <label for="field-input"><i class="fas fa-key"></i> 字段列表（每行一个字段）</label>
-                        <textarea id="field-input" placeholder="在此输入字段名称，每行一个字段"></textarea>
-                        <p class="input-hint">每行输入一个字段名称，输入内容会自动加载到输出区域</p>
+                        <label for="field-input"><i class="fas fa-key"></i> 字段列表（支持逗号分隔和换行分隔）</label>
+                        <textarea id="field-input" placeholder="支持逗号分隔或每行一个字段：
+id, username as 用户名, email 邮箱, create_time
+update_time, status as 状态"></textarea>
+                        <p class="input-hint">支持逗号分隔或每行一个字段。支持别名：字段名 as 别名 或 字段名 别名</p>
                         <div class="auto-load-hint">
                             <i class="fas fa-sync-alt"></i> 自动加载已启用
                         </div>
@@ -503,19 +510,6 @@
             // 防抖计时器
             let debounceTimer = null;
             
-            // SQL保留字列表（忽略大小写）
-            const sqlReservedWords = [
-                'PARTITION BY', 'ORDER BY', 'ROW_NUMBER', 'DESC', 'ASC', 
-                'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'LIMIT',
-                'OFFSET', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
-                'FULL JOIN', 'ON', 'AS', 'DISTINCT', 'UNION', 'UNION ALL',
-                'EXISTS', 'IN', 'NOT IN', 'BETWEEN', 'LIKE', 'IS NULL',
-                'IS NOT NULL', 'AND', 'OR', 'NOT', 'CASE', 'WHEN', 'THEN',
-                'ELSE', 'END', 'OVER', 'RANK', 'DENSE_RANK', 'LEAD', 'LAG',
-                'FIRST_VALUE', 'LAST_VALUE', 'COUNT', 'SUM', 'AVG', 'MIN',
-                'MAX', 'CAST', 'CONVERT', 'COALESCE', 'NULLIF'
-            ];
-            
             // 从localStorage加载已保存的字段
             loadFieldsFromStorage();
             
@@ -541,24 +535,138 @@
             // 解析排除字段输入
             function parseExcludeFields(excludeText) {
                 if (!excludeText.trim()) {
+                    return {
+                        withAlias: [],
+                        withoutAlias: []
+                    };
+                }
+                
+                // 按逗号或空格分割，过滤空值
+                const excludeItems = excludeText
+                    .split(/[\s,]+/)
+                    .map(item => item.trim())
+                    .filter(item => item !== '');
+                
+                // 将排除字段分为两类：
+                // 1. 带表别名的排除字段（如"USER.id"）
+                // 2. 不带表别名的排除字段（如"id"）
+                const excludeFields = {
+                    withAlias: [],  // 包含alias和name的对象数组
+                    withoutAlias: [] // 只包含字段名的数组
+                };
+                
+                excludeItems.forEach(item => {
+                    // 检查是否包含点号（表别名.字段名）
+                    if (item.includes('.')) {
+                        const parts = item.split('.');
+                        if (parts.length === 2) {
+                            const alias = parts[0].toUpperCase();
+                            const name = parts[1].toLowerCase();
+                            excludeFields.withAlias.push({ alias, name });
+                        }
+                    } else {
+                        // 没有表别名，只排除字段名
+                        excludeFields.withoutAlias.push(item.toLowerCase());
+                    }
+                });
+                
+                return excludeFields;
+            }
+            
+            // 解析字段输入（支持逗号分隔和换行分隔，支持别名）
+            function parseFieldInput(fieldText) {
+                if (!fieldText.trim()) {
                     return [];
                 }
                 
-                // 将SQL保留字替换为空字符串（不区分大小写）
-                let cleanedText = excludeText.toUpperCase();
-                sqlReservedWords.forEach(reserved => {
-                    const regex = new RegExp(reserved.toUpperCase(), 'gi');
-                    cleanedText = cleanedText.replace(regex, '');
+                // 先按换行分割
+                const lines = fieldText.split('\n');
+                let fieldItems = [];
+                
+                // 处理每一行
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) return;
+                    
+                    // 按逗号分割
+                    const commaItems = trimmedLine.split(',')
+                        .map(item => item.trim())
+                        .filter(item => item !== '');
+                    
+                    // 将逗号分隔的项添加到结果中
+                    fieldItems.push(...commaItems);
                 });
                 
-                // 按逗号或空格分割，过滤空值
-                const excludeFields = cleanedText
-                    .split(/[\s,]+/)
-                    .map(field => field.trim())
-                    .filter(field => field !== '')
-                    .map(field => field.toLowerCase());
+                // 解析每个字段项，提取字段名和别名
+                const parsedFields = [];
                 
-                return excludeFields;
+                fieldItems.forEach(fieldItem => {
+                    // 解析字段名和别名
+                    let fieldName = fieldItem;
+                    let fieldAlias = '';
+                    
+                    // 检查是否有别名（支持 "as" 或空格）
+                    const asIndex = fieldItem.toLowerCase().indexOf(' as ');
+                    if (asIndex !== -1) {
+                        // 使用 "as" 分隔
+                        fieldName = fieldItem.substring(0, asIndex).trim();
+                        fieldAlias = fieldItem.substring(asIndex + 4).trim();
+                    } else {
+                        // 检查是否有空格分隔（最后一个空格）
+                        const lastSpaceIndex = fieldItem.lastIndexOf(' ');
+                        if (lastSpaceIndex !== -1) {
+                            const beforeSpace = fieldItem.substring(0, lastSpaceIndex).trim();
+                            const afterSpace = fieldItem.substring(lastSpaceIndex + 1).trim();
+                            
+                            // 如果空格前后都有内容，且不是点号分隔的表别名
+                            if (beforeSpace && afterSpace && !beforeSpace.includes('.')) {
+                                fieldName = beforeSpace;
+                                fieldAlias = afterSpace;
+                            }
+                        }
+                    }
+                    
+                    // 提取字段名（去除表别名）
+                    let cleanFieldName = fieldName;
+                    if (fieldName.includes('.')) {
+                        const parts = fieldName.split('.');
+                        cleanFieldName = parts[parts.length - 1]; // 取最后一部分
+                    }
+                    
+                    // 如果没有别名，则使用字段名
+                    if (!fieldAlias) {
+                        fieldAlias = cleanFieldName;
+                    }
+                    
+                    parsedFields.push({
+                        original: fieldItem,
+                        fieldName: cleanFieldName,
+                        alias: fieldAlias
+                    });
+                });
+                
+                return parsedFields;
+            }
+            
+            // 检查字段是否需要被排除
+            function shouldExcludeField(fieldInfo, aliasUpper, excludeFields) {
+                const fieldNameLower = fieldInfo.fieldName.toLowerCase();
+                const aliasLower = fieldInfo.alias.toLowerCase();
+                
+                // 首先检查带表别名的排除字段
+                for (const excludeItem of excludeFields.withAlias) {
+                    if (excludeItem.alias === aliasUpper && excludeItem.name === fieldNameLower) {
+                        return true;
+                    }
+                }
+                
+                // 然后检查不带表别名的排除字段
+                if (excludeFields.withoutAlias.includes(fieldNameLower) || 
+                    excludeFields.withoutAlias.includes(aliasLower)) {
+                    return true;
+                }
+                
+                return false;
             }
             
             // 加载字段函数
@@ -576,12 +684,10 @@
                 // 表别名转为大写
                 const aliasUpper = alias.toUpperCase();
                 
-                // 按行分割字段，过滤空行和空白字符
-                const fieldNames = fieldText.split('\n')
-                    .map(field => field.trim())
-                    .filter(field => field !== '');
+                // 解析字段输入
+                const parsedFields = parseFieldInput(fieldText);
                 
-                if (fieldNames.length === 0) {
+                if (parsedFields.length === 0) {
                     // 没有有效字段时不执行加载
                     return;
                 }
@@ -589,9 +695,12 @@
                 // 解析排除字段
                 const excludeFields = parseExcludeFields(excludeText);
                 
+                // 计算排除字段总数
+                const excludeTotalCount = excludeFields.withAlias.length + excludeFields.withoutAlias.length;
+                
                 // 更新输入统计
-                inputFieldCount.textContent = fieldNames.length;
-                excludeFieldCount.textContent = excludeFields.length;
+                inputFieldCount.textContent = parsedFields.length;
+                excludeFieldCount.textContent = excludeTotalCount;
                 
                 // 清空原来的字段数组
                 fields = [];
@@ -601,9 +710,9 @@
                 let filteredCount = 0;
                 
                 // 为每个字段名创建字段对象（排除指定的字段）
-                fieldNames.forEach(fieldName => {
-                    // 检查字段是否在排除列表中（不区分大小写）
-                    if (excludeFields.includes(fieldName.toLowerCase())) {
+                parsedFields.forEach(fieldInfo => {
+                    // 检查字段是否应该被排除
+                    if (shouldExcludeField(fieldInfo, aliasUpper, excludeFields)) {
                         filteredCount++;
                         return; // 跳过排除的字段
                     }
@@ -611,9 +720,10 @@
                     const newField = {
                         id: Date.now() + Math.random(),
                         alias: aliasUpper,
-                        name: fieldName,
-                        // 如果表别名为空，则只显示字段名
-                        fullText: aliasUpper ? `${aliasUpper}.${fieldName}` : fieldName
+                        fieldName: fieldInfo.fieldName,
+                        fieldAlias: fieldInfo.alias,
+                        // 如果表别名为空，则只显示别名
+                        fullText: aliasUpper ? `${aliasUpper}.${fieldInfo.alias}` : fieldInfo.alias
                     };
                     
                     fields.push(newField);
@@ -662,10 +772,19 @@
                     fieldElement.className = 'field-item';
                     fieldElement.dataset.id = field.id;
                     
-                    // 根据是否有别名决定显示方式
-                    const fieldDisplay = field.alias ? 
-                        `<span class="alias">${field.alias}.</span><span class="field-name">${field.name}</span>` : 
-                        `<span class="field-name">${field.name}</span>`;
+                    // 显示字段信息
+                    let fieldDisplay = '';
+                    if (field.alias) {
+                        fieldDisplay += `<span class="alias">${field.alias}.</span>`;
+                    }
+                    
+                    // 如果字段名和别名不同，显示别名
+                    if (field.fieldName !== field.fieldAlias) {
+                        fieldDisplay += `<span class="field-name">${field.fieldAlias}</span>`;
+                        fieldDisplay += ` <span class="field-alias">(${field.fieldName})</span>`;
+                    } else {
+                        fieldDisplay += `<span class="field-name">${field.fieldName}</span>`;
+                    }
                     
                     fieldElement.innerHTML = `
                         <div class="field-info">
@@ -704,8 +823,8 @@
                 
                 // 显示通知
                 const fieldName = fieldToDelete.alias ? 
-                    `${fieldToDelete.alias}.${fieldToDelete.name}` : 
-                    fieldToDelete.name;
+                    `${fieldToDelete.alias}.${fieldToDelete.fieldAlias}` : 
+                    fieldToDelete.fieldAlias;
                 showNotification(`已删除字段 ${fieldName}`);
             }
             
