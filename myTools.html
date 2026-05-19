@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦幻西游渐变文字生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #4a4a8a;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #ffcc00;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .description {
+            color: #a0a0c0;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #4a4a8a;
+            background: rgba(20, 20, 40, 0.8);
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .color-pickers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .color-picker {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .color-display {
+            height: 40px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .color-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .color-control-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 204, 0, 0.3);
+            color: #ffcc00;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .color-control-btn:hover {
+            background: rgba(255, 204, 0, 0.5);
+        }
+        
+        .gradient-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .gradient-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .preset-btn {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.2s;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(20, 20, 40, 0.8);
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffcc00;
+            cursor: pointer;
+        }
+        
+        .preview-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(10, 10, 20, 0.6);
+            border-radius: 10px;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .preview-title {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-box {
+            min-height: 80px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .code-section {
+            margin-bottom: 25px;
+        }
+        
+        .code-output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            padding: 15px;
+            background: rgba(10, 10, 20, 0.6);
+            border-radius: 8px;
+            min-height: 80px;
+            overflow-x: auto;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #ff9900, #ffcc00);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(to right, #3366ff, #6699ff);
+            color: white;
+        }
+        
+        .hint {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ffcc00;
+            font-size: 14px;
+        }
+        
+        .example-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a0a0c0;
+        }
+        
+        .example-text span {
+            color: #ffcc00;
+            cursor: pointer;
+            text-decoration: underline;
+            margin: 0 5px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background: rgba(255, 204, 0, 0.1);
+        }
+        
+        .example-text span:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .color-pickers {
+                grid-template-columns: 1fr;
+            }
+            
+            .gradient-options {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>梦幻西游渐变文字生成器</h1>
+            <p class="description">生成渐变色文本代码，支持多色渐变效果</p>
+        </header>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="inputText">输入文本内容</label>
+                <textarea id="inputText" placeholder="请输入要在游戏中显示的文本...">129抓鬼，8眼，5门,已有LB，XL++++</textarea>
+            </div>
+            
+            <div class="color-controls">
+                <button class="color-control-btn" onclick="addColor()">+ 添加颜色</button>
+                <button class="color-control-btn" onclick="removeColor()">- 移除颜色</button>
+                <button class="color-control-btn" onclick="resetColors()">重置颜色</button>
+            </div>
+            
+            <div class="color-pickers" id="colorPickers">
+                <div class="color-picker">
+                    <label for="color1">颜色 1</label>
+                    <input type="color" id="color1" value="#ff6b8b" class="color-input">
+                    <div class="color-display" style="background-color: #ff6b8b;"></div>
+                </div>
+                <div class="color-picker">
+                    <label for="color2">颜色 2</label>
+                    <input type="color" id="color2" value="#ffa73a" class="color-input">
+                    <div class="color-display" style="background-color: #ffa73a;"></div>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="gradientStyle">渐变样式</label>
+                <select id="gradientStyle">
+                    <option value="smooth">平滑渐变</option>
+                    <option value="rainbow">彩虹渐变</option>
+                    <option value="fire">火焰渐变</option>
+                    <option value="ice">冰霜渐变</option>
+                    <option value="forest">森林渐变</option>
+                    <option value="ocean">海洋渐变</option>
+                    <option value="custom">自定义渐变</option>
+                </select>
+            </div>
+            
+            <div class="gradient-presets">
+                <button class="preset-btn" style="background: linear-gradient(to right, #ff6b8b, #ffa73a, #ffcc00);" onclick="setMultiGradient(['#ff6b8b', '#ffa73a', '#ffcc00'])">三色橙黄</button>
+                <button class="preset-btn" style="background: linear-gradient(to right, #3366ff, #66ccff, #00ffff);" onclick="setMultiGradient(['#3366ff', '#66ccff', '#00ffff'])">三色蓝海</button>
+                <button class="preset-btn" style="background: linear-gradient(to right, #ff3366, #ff66cc, #cc33ff);" onclick="setMultiGradient(['#ff3366', '#ff66cc', '#cc33ff'])">三色粉紫</button>
+                <button class="preset-btn" style="background: linear-gradient(to right, #ff6b8b, #ffa73a, #ffcc00, #99ff66);" onclick="setMultiGradient(['#ff6b8b', '#ffa73a', '#ffcc00', '#99ff66'])">四色彩虹</button>
+                <button class="preset-btn" style="background: linear-gradient(to right, #ff3300, #ff9900, #ffcc00, #ffff00);" onclick="setMultiGradient(['#ff3300', '#ff9900', '#ffcc00', '#ffff00'])">四色火焰</button>
+                <button class="preset-btn" style="background: linear-gradient(to right, #00ccff, #66ffff, #00ffcc, #00cc99);" onclick="setMultiGradient(['#00ccff', '#66ffff', '#00ffcc', '#00cc99'])">四色冰海</button>
+            </div>
+            
+            <div class="gradient-options">
+                <div class="input-group">
+                    <label for="gradientDirection">渐变方向</label>
+                    <select id="gradientDirection">
+                        <option value="horizontal">水平（从左到右）</option>
+                        <option value="vertical">垂直（从上到下）</option>
+                        <option value="diagonal">对角线（左上到右下）</option>
+                        <option value="reverse">反向（从右到左）</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="gradientIntensity">渐变强度: <span id="intensityValue">5</span></label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="gradientIntensity">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="preview-title">
+                <span>预览效果</span>
+                <span id="charCount">0 字符</span>
+            </div>
+            <div class="preview-box" id="preview"></div>
+        </div>
+        
+        <div class="code-section">
+            <label for="codeOutput">生成的代码（点击下方复制按钮）</label>
+            <div class="code-output" id="codeOutput"></div>
+        </div>
+        
+        <div class="buttons">
+            <button id="generateBtn">生成代码</button>
+            <button id="copyBtn" class="copy-btn">复制代码</button>
+        </div>
+        
+        <div class="hint">
+            <strong>使用说明：</strong> 在游戏中聊天框直接粘贴生成的代码即可显示渐变色效果。代码格式为 #c + 6位颜色码 + 文字内容。
+        </div>
+        
+        <div class="example-text">
+            常用喊话示例：
+            <span onclick="loadExample(this)">129抓鬼，8眼、5门，已有LB,+++++Q4</span>
+            <span onclick="loadExample(this)">129抓鬼+++++</span>
+            <span onclick="loadExample(this)">铃铛来人Q4</span>
+            <span onclick="loadExample(this)">副本求组</span>
+            <span onclick="loadExample(this)">免费带小号</span>
+            <span onclick="loadExample(this)">XL来个HSQ1</span>
+            <span onclick="loadExample(this)">神器来个封系</span>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const inputText = document.getElementById('inputText');
+        const colorPickers = document.getElementById('colorPickers');
+        const gradientStyle = document.getElementById('gradientStyle');
+        const gradientDirection = document.getElementById('gradientDirection');
+        const gradientIntensity = document.getElementById('gradientIntensity');
+        const intensityValue = document.getElementById('intensityValue');
+        const preview = document.getElementById('preview');
+        const codeOutput = document.getElementById('codeOutput');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const charCount = document.getElementById('charCount');
+        
+        let colorCount = 2; // 初始颜色数量
+        
+        // 初始化
+        window.addEventListener('load', function() {
+            updateColorDisplays();
+            generateCode();
+            
+            // 为所有颜色输入框添加事件监听
+            document.querySelectorAll('.color-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    updateColorDisplay(this.id);
+                    generateCode();
+                });
+            });
+        });
+        
+        // 更新颜色显示
+        function updateColorDisplays() {
+            document.querySelectorAll('.color-input').forEach(input => {
+                const display = input.nextElementSibling;
+                if (display && display.classList.contains('color-display')) {
+                    display.style.backgroundColor = input.value;
+                }
+            });
+        }
+        
+        // 更新单个颜色显示
+        function updateColorDisplay(colorId) {
+            const input = document.getElementById(colorId);
+            const display = input.nextElementSibling;
+            if (display && display.classList.contains('color-display')) {
+                display.style.backgroundColor = input.value;
+            }
+        }
+        
+        // 添加颜色
+        function addColor() {
+            if (colorCount >= 6) return; // 最多6个颜色
+            
+            colorCount++;
+            const newColorId = `color${colorCount}`;
+            const randomColor = getRandomColor();
+            
+            const colorPicker = document.createElement('div');
+            colorPicker.className = 'color-picker';
+            colorPicker.innerHTML = `
+                <label for="${newColorId}">颜色 ${colorCount}</label>
+                <input type="color" id="${newColorId}" value="${randomColor}" class="color-input">
+                <div class="color-display" style="background-color: ${randomColor};"></div>
+            `;
+            
+            colorPickers.appendChild(colorPicker);
+            
+            // 添加事件监听
+            document.getElementById(newColorId).addEventListener('input', function() {
+                updateColorDisplay(this.id);
+                generateCode();
+            });
+            
+            generateCode();
+        }
+        
+        // 移除颜色
+        function removeColor() {
+            if (colorCount <= 2) return; // 最少2个颜色
+            
+            const lastColor = document.getElementById(`color${colorCount}`);
+            if (lastColor) {
+                lastColor.parentElement.remove();
+            }
+            colorCount--;
+            generateCode();
+        }
+        
+        // 重置颜色
+        function resetColors() {
+            colorCount = 2;
+            colorPickers.innerHTML = `
+                <div class="color-picker">
+                    <label for="color1">颜色 1</label>
+                    <input type="color" id="color1" value="#ff6b8b" class="color-input">
+                    <div class="color-display" style="background-color: #ff6b8b;"></div>
+                </div>
+                <div class="color-picker">
+                    <label for="color2">颜色 2</label>
+                    <input type="color" id="color2" value="#ffa73a" class="color-input">
+                    <div class="color-display" style="background-color: #ffa73a;"></div>
+                </div>
+            `;
+            
+            // 重新添加事件监听
+            document.querySelectorAll('.color-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    updateColorDisplay(this.id);
+                    generateCode();
+                });
+            });
+            
+            generateCode();
+        }
+        
+        // 获取随机颜色
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+        
+        // 设置多色渐变
+        function setMultiGradient(colors) {
+            resetColors();
+            
+            // 动态调整颜色数量
+            while (colorCount < colors.length) {
+                addColor();
+            }
+            while (colorCount > colors.length) {
+                removeColor();
+            }
+            
+            // 设置颜色值
+            colors.forEach((color, index) => {
+                const colorInput = document.getElementById(`color${index + 1}`);
+                if (colorInput) {
+                    colorInput.value = color;
+                    updateColorDisplay(`color${index + 1}`);
+                }
+            });
+            
+            generateCode();
+        }
+        
+        // 更新强度值显示
+        gradientIntensity.addEventListener('input', function() {
+            intensityValue.textContent = this.value;
+            generateCode();
+        });
+        
+        // 事件监听器
+        gradientStyle.addEventListener('change', function() {
+            applyGradientStyle();
+            generateCode();
+        });
+        
+        gradientDirection.addEventListener('change', generateCode);
+        
+        // 应用渐变样式
+        function applyGradientStyle() {
+            const style = gradientStyle.value;
+            
+            switch(style) {
+                case 'rainbow':
+                    setMultiGradient(['#ff3366', '#ff9900', '#ffcc00', '#99ff66', '#66ccff']);
+                    break;
+                case 'fire':
+                    setMultiGradient(['#ff3300', '#ff6600', '#ff9900', '#ffcc00']);
+                    break;
+                case 'ice':
+                    setMultiGradient(['#00ccff', '#66ffff', '#00ffcc', '#00cc99']);
+                    break;
+                case 'forest':
+                    setMultiGradient(['#006633', '#00cc66', '#66ff99', '#ccffcc']);
+                    break;
+                case 'ocean':
+                    setMultiGradient(['#000066', '#3366ff', '#66ccff', '#99ffff']);
+                    break;
+                case 'custom':
+                    // 保持当前颜色不变
+                    break;
+                default: // smooth
+                    setMultiGradient(['#ff6b8b', '#ffa73a']);
+            }
+        }
+        
+        // 十六进制颜色转RGB
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            return { r, g, b };
+        }
+        
+        // RGB转十六进制颜色
+        function rgbToHex(r, g, b) {
+            return "#" + 
+                ((1 << 24) + (r << 16) + (g << 8) + b)
+                .toString(16)
+                .slice(1)
+                .toUpperCase();
+        }
+        
+        // 获取所有颜色值
+        function getColors() {
+            const colors = [];
+            for (let i = 1; i <= colorCount; i++) {
+                const colorInput = document.getElementById(`color${i}`);
+                if (colorInput) {
+                    colors.push(colorInput.value);
+                }
+            }
+            return colors;
+        }
+        
+        // 生成代码
+        function generateCode() {
+            const text = inputText.value;
+            if (!text) {
+                preview.innerHTML = '';
+                codeOutput.textContent = '';
+                charCount.textContent = '0 字符';
+                return;
+            }
+            
+            const colors = getColors();
+            const intensity = parseInt(gradientIntensity.value);
+            const direction = gradientDirection.value;
+            
+            let previewHtml = '';
+            let code = '';
+            
+            // 根据方向调整字符处理顺序
+            let charArray = text.split('');
+            if (direction === 'reverse') {
+                charArray = charArray.reverse();
+            }
+            
+            // 为每个字符生成渐变色
+            for (let i = 0; i < charArray.length; i++) {
+                let ratio;
+                
+                if (direction === 'vertical') {
+                    const rowSize = Math.max(1, Math.floor(Math.sqrt(charArray.length)));
+                    const row = Math.floor(i / rowSize);
+                    ratio = row / Math.max(1, Math.floor(charArray.length / rowSize));
+                } else if (direction === 'diagonal') {
+                    const rowSize = Math.max(1, Math.floor(Math.sqrt(charArray.length)));
+                    const row = Math.floor(i / rowSize);
+                    const col = i % rowSize;
+                    ratio = (row + col) / (rowSize * 2);
+                } else {
+                    ratio = i / Math.max(1, charArray.length - 1);
+                }
+                
+                // 应用强度
+                ratio = Math.pow(ratio, intensity / 5);
+                
+                // 多色渐变计算
+                const segment = ratio * (colors.length - 1);
+                const colorIndex = Math.floor(segment);
+                const colorRatio = segment - colorIndex;
+                
+                let r, g, b;
+                if (colorIndex === colors.length - 1) {
+                    const rgb = hexToRgb(colors[colors.length - 1]);
+                    r = rgb.r; g = rgb.g; b = rgb.b;
+                } else {
+                    const startRgb = hexToRgb(colors[colorIndex]);
+                    const endRgb = hexToRgb(colors[colorIndex + 1]);
+                    r = Math.round(startRgb.r + (endRgb.r - startRgb.r) * colorRatio);
+                    g = Math.round(startRgb.g + (endRgb.g - startRgb.g) * colorRatio);
+                    b = Math.round(startRgb.b + (endRgb.b - startRgb.b) * colorRatio);
+                }
+                
+                const hexColor = rgbToHex(r, g, b);
+                
+                // 构建预览
+                previewHtml += `<span style="color: ${hexColor}">${charArray[i]}</span>`;
+                
+                // 构建代码
+                code += `#c${hexColor.substring(1)}${charArray[i]}`;
+            }
+            
+            preview.innerHTML = previewHtml;
+            codeOutput.textContent = code;
+            charCount.textContent = `${text.length} 字符`;
+        }
+        
+        // 复制代码
+        copyBtn.addEventListener('click', function() {
+            const text = codeOutput.textContent;
+            if (!text) return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制代码';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                // 备用复制方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制代码';
+                }, 2000);
+            });
+        });
+        
+        // 初始生成代码
+        generateBtn.addEventListener('click', generateCode);
+        
+        // 输入文本时实时生成
+        inputText.addEventListener('input', generateCode);
+        
+        // 加载示例文本
+        function loadExample(element) {
+            inputText.value = element.textContent;
+            generateCode();
+        }
+    </script>
+</body>
+</html>

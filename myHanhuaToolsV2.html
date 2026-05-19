@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦幻西游内容着色器 - 优化版</title>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #app {
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .container {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .title {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .description {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 1.75rem;
+            }
+        }
+        
+        .settings-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid var(--card-border);
+        }
+        
+        .input-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            border: 1px solid var(--card-border);
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .textarea-field {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.4);
+            color: var(--light);
+            font-size: 1rem;
+            min-height: 150px;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+        
+        .textarea-field:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .category-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.8rem;
+        }
+        
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem;
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .category-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .category-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        .category-label {
+            min-width: 70px;
+            color: var(--light);
+            font-weight: 500;
+            flex-grow: 1;
+            font-size: 0.9rem;
+        }
+        
+        .category-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        
+        .category-color:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-picker-container {
+            position: relative;
+        }
+        
+        .color-picker-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--dark);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            min-width: 280px;
+            max-width: 90vw;
+        }
+        
+        .color-picker-popup.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .color-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .color-picker-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .color-picker-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .color-picker-close:hover {
+            color: var(--light);
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: var(--light);
+        }
+        
+        .color-option.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .custom-color-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .custom-color-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+            font-size: 0.9rem;
+        }
+        
+        .custom-color-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .custom-color-preview {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .custom-color-value {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.4);
+            color: var(--light);
+        }
+        
+        .color-picker-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .color-picker-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .color-picker-confirm {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .color-picker-confirm:hover {
+            background: var(--primary-hover);
+        }
+        
+        .color-picker-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+        
+        .color-picker-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        
+        .preset-btn {
+            padding: 0.5rem 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .preview-section {
+            margin-bottom: 1.2rem;
+            padding: 1.2rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .preview-title {
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .preview-box {
+            min-height: 80px;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+            word-break: break-all;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .code-section {
+            margin-bottom: 1.2rem;
+        }
+        
+        .code-output {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            white-space: pre-wrap;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 10px;
+            min-height: 80px;
+            overflow-x: auto;
+            border: 1px solid var(--card-border);
+            font-size: 0.9rem;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-copy {
+            background: var(--secondary);
+        }
+        
+        .btn-copy:hover {
+            background: #7c3aed;
+        }
+        
+        .examples-section {
+            margin-top: 1.5rem;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        
+        .example-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .example-title {
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .example-content {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .hint {
+            margin-top: 1.2rem;
+            padding: 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .tab-button {
+            padding: 0.6rem 1.2rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .icon {
+            font-size: 1rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .container {
+                padding: 0.8rem;
+                border-radius: 12px;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .category-settings {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                flex-direction: column;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .color-picker-popup {
+                width: 95%;
+                padding: 1rem;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="overlay" :class="{ show: showColorPicker }" @click="closeColorPicker"></div>
+        
+        <div class="color-picker-popup" :class="{ show: showColorPicker }">
+            <div class="color-picker-header">
+                <h3 class="color-picker-title">选择 {{ currentCategory ? currentCategory.label : '' }} 颜色</h3>
+                <button class="color-picker-close" @click="closeColorPicker">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="color-grid">
+                <div v-for="color in colorOptions" 
+                     :key="color"
+                     class="color-option"
+                     :style="{ backgroundColor: color }"
+                     :class="{ selected: selectedColor === color }"
+                     @click="selectColor(color)">
+                </div>
+            </div>
+            
+            <div class="custom-color-section">
+                <label class="custom-color-label">自定义颜色：</label>
+                <div class="custom-color-input">
+                    <div class="custom-color-preview" :style="{ backgroundColor: customColor }"></div>
+                    <input type="text" class="custom-color-value" v-model="customColor" placeholder="#ffffff">
+                    <input type="color" v-model="customColor" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="color-picker-actions">
+                <button class="color-picker-btn color-picker-cancel" @click="closeColorPicker">取消</button>
+                <button class="color-picker-btn color-picker-confirm" @click="confirmColor">确认</button>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="header">
+                <h1 class="title">梦幻西游内容着色器</h1>
+                <p class="description">智能识别文本内容并自动着色，让聊天信息更醒目</p>
+            </div>
+            
+            <div class="main-content">
+                <div class="settings-section">
+                    <div class="tab-buttons">
+                        <button class="tab-button active">分类着色</button>
+                    </div>
+                    
+                    <div class="tab-content active">
+                        <div class="input-group">
+                            <label class="input-label">内容分类着色设置</label>
+                            <div class="category-settings">
+                                <div v-for="(category, key) in categories" :key="key" class="category-item">
+                                    <input type="checkbox" class="category-checkbox" v-model="category.enabled" :id="'checkbox-'+key">
+                                    <label class="category-label" :for="'checkbox-'+key">{{ category.label }}</label>
+                                    <div class="color-picker-container">
+                                        <div class="category-color" 
+                                             :style="{ backgroundColor: category.color }" 
+                                             @click="openColorPicker(key, category)"
+                                             :aria-label="'修改'+category.label+'颜色'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="preset-buttons">
+                                <button class="preset-btn" @click="applyColorPreset('warm')">
+                                    <i class="fas fa-fire icon"></i> 暖色系
+                                </button>
+                                <button class="preset-btn" @click="applyColorPreset('cool')">
+                                    <i class="fas fa-snowflake icon"></i> 冷色系
+                                </button>
+                                <button class="preset-btn" @click="applyColorPreset('rainbow')">
+                                    <i class="fas fa-rainbow icon"></i> 彩虹色
+                                </button>
+                                <button class="preset-btn" @click="applyColorPreset('pastel')">
+                                    <i class="fas fa-pastafarianism icon"></i> 柔和色
+                                </button>
+                                <button class="preset-btn" @click="resetColors">
+                                    <i class="fas fa-undo icon"></i> 重置颜色
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-section">
+                    <div class="input-group">
+                        <label class="input-label">输入文本内容</label>
+                        <textarea class="textarea-field" v-model="inputText" placeholder="请输入要在游戏中显示的文本..." @input="debounceGenerateCode"></textarea>
+                    </div>
+                    
+                    <div class="preview-section">
+                        <div class="preview-title">
+                            <span>预览效果</span>
+                            <span>{{ inputText.length }} 字符</span>
+                        </div>
+                        <div class="preview-box" v-html="previewHtml"></div>
+                    </div>
+                    
+                    <div class="code-section">
+                        <label class="input-label">生成的代码（点击下方复制按钮）</label>
+                        <div class="code-output">{{ generatedCode }}</div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button class="btn" @click="generateCode">
+                            <i class="fas fa-code icon"></i> 生成着色代码
+                        </button>
+                        <button class="btn btn-copy" @click="copyCode">
+                            <i class="fas fa-copy icon"></i> 复制代码
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="examples-section">
+                <label class="input-label">常用示例（点击使用）</label>
+                <div class="examples-grid">
+                    <div class="example-card" v-for="(example, index) in examples" :key="index" @click="loadExample(example)" :aria-label="'加载示例: '+example.title">
+                        <div class="example-title">{{ example.title }}</div>
+                        <div class="example-content">{{ example.content }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hint">
+                <strong>使用说明：</strong> 系统会自动识别文本中的价格、物品、地点等信息并着色。您可以自定义每个分类的颜色，也可以使用预设配色方案。
+            </div>
+        </div>
+        
+        <div class="toast" :class="{ show: showToast }">
+            <i class="fas fa-check-circle"></i> {{ toastMessage }}
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                inputText: '129抓鬼++++++8眼/30个/5门，已有LB,++++++Q4',
+                categories: {
+                    price: {
+                        label: '价格',
+                        color: '#ef4444',
+                        enabled: true,
+                        rules: [/\d+[万千亿WMKY]/g, /[\d.]+[万千亿WMKY]/g]
+                    },
+                    item: {
+                        label: '物品',
+                        color: '#10b981',
+                        enabled: true,
+                        rules: [
+                            /[\u4e00-\u9fa5]{2,6}(靴|鞋|帽|盔|甲|衣|刀|剑|枪|扇|鞭|环|爪|锤|斧|腰带|项链|饰品)/g,
+                            /(高级|高)[\u4e00-\u9fa5]{2,4}/g,
+                            /[\u4e00-\u9fa5]{2,6}(决|要诀|兽决)/g,
+                            /[\u4e00-\u9fa5]{2,4}宝石/g,
+                            /[\u4e00-\u9fa5]{2,6}丹/g
+                        ]
+                    },
+                    location: {
+                        label: '地点',
+                        color: '#3b82f6',
+                        enabled: true,
+                        rules: [
+                            /(长安城|建邺城|傲来国|长寿村|宝象国|朱紫国|西梁女国|女儿村|普陀山|五庄观|方寸山|天宫|龙宫|地府|魔王寨|狮驼岭|化生寺|大唐官府|月宫)/g,
+                            /(国境|野外|东海湾|江南野外|大唐境外|麒麟山|凤凰台|神兽乐园|御风林)/g,
+                            /(天台|XL|xl|AL|al|TT|tt|西凉|女国|驿站|商会|酒店|药店|铁匠铺|布店|饰品店|CA|ca|长安)/gi
+                        ]
+                    },
+                    action: {
+                        label: '动作',
+                        color: '#8b5cf6',
+                        enabled: true,
+                        rules: [
+                            /(出售|求购|收购|交易|打包|带走|要的|MMM|滴滴)/g,
+                            /(组队|来人|Q\d|来\d|差\d|速度|开车)/g,
+                            /(副本|活动|任务|帮战|比武|竞技|抓鬼)/g
+                        ]
+                    },
+                    number: {
+                        label: '数字',
+                        color: '#f59e0b',
+                        enabled: true,
+                        rules: [/\d+/g]
+                    },
+                    pet: {
+                        label: '召唤兽',
+                        color: '#ec4899',
+                        enabled: true,
+                        rules: [
+                            /(大海龟|巨蛙|海毛虫|大蝙蝠|强盗|山贼|骷髅怪|羊头怪|蛤蟆精|狐狸精|黑熊精|花妖|牛头|马面|僵尸|野鬼|小龙女|狼|虾兵|蟹将|龟丞相|兔子怪|蜘蛛精|黑熊|白熊|黑山老妖|麒麟|凤凰|蛟龙|雨师|巡游天神|星灵仙子|芙蓉仙子|如意仙子|灵符女娲|律法女娲|幽灵|鬼将|净瓶女娲|吸血鬼|阴阳伞|大力金刚|夜罗刹|金刚狼|葫芦宝贝|藤蔓妖花|巨力神猿|修罗傀儡鬼|蜃气妖|金铙僧|曼珠沙华|长眉灵猴)/g
+                        ]
+                    },
+                    school: {
+                        label: '门派',
+                        color: '#f97316',
+                        enabled: true,
+                        rules: [
+                            /(大唐官府|方寸山|化生寺|女儿村|天宫|龙宫|五庄观|普陀山|阴曹地府|魔王寨|狮驼岭|盘丝洞|凌波城|无底洞|神木林|花果山|女魃墓|天机城|东海渊)/g,
+                            /(DT|SM|LB|LBC|MW|NR|HS|LG|DF|TG|WZ|FC|ST|PT|PS|WDD|SML|HG|NBM|TJC|DHY)/gi
+                        ]
+                    }
+                },
+                colorOptions: [
+                    '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981',
+                    '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef',
+                    '#ec4899', '#f43f5e', '#64748b', '#475569', '#334155',
+                    '#fda4af', '#fcd34d', '#a5f3fc', '#c7d2fe', '#ddd6fe'
+                ],
+                colorPresets: {
+                    warm: {
+                        price: "#ef4444",
+                        item: "#f97316",
+                        location: "#f59e0b",
+                        action: "#ef4444",
+                        number: "#f97316",
+                        pet: "#ec4899",
+                        school: "#f59e0b"
+                    },
+                    cool: {
+                        price: "#3b82f6",
+                        item: "#8b5cf6",
+                        location: "#06b6d4",
+                        action: "#3b82f6",
+                        number: "#8b5cf6",
+                        pet: "#ec4899",
+                        school: "#06b6d4"
+                    },
+                    rainbow: {
+                        price: "#ef4444",
+                        item: "#f59e0b",
+                        location: "#10b981",
+                        action: "#3b82f6",
+                        number: "#8b5cf6",
+                        pet: "#ec4899",
+                        school: "#f97316"
+                    },
+                    pastel: {
+                        price: "#fda4af",
+                        item: "#fcd34d",
+                        location: "#a5f3fc",
+                        action: "#c7d2fe",
+                        number: "#ddd6fe",
+                        pet: "#fbcfe8",
+                        school: "#fed7aa"
+                    }
+                },
+                examples: [
+                    {
+                        title: "抓鬼任务",
+                        content: "129抓鬼++++++8眼/30个/五门，已有LB,++++++Q4"
+                    },
+                    {
+                        title: "门派组队",
+                        content: "DT LB MW NR 来组队，AL抓鬼，Q4"
+                    },
+                    {
+                        title: "地点任务",
+                        content: "去方寸山做任务，需要封系和辅助"
+                    },
+                    {
+                        title: "门派招募",
+                        content: "方寸山收徒弟，要求等级≥50，有耐心"
+                    },
+                    {
+                        title: "出售物品",
+                        content: "出售80级破血鞋子3000W，傲来国交易，要的MMM"
+                    },
+                    {
+                        title: "求购物品",
+                        content: "求购高级必杀500W，高级连击800W，长安城交易"
+                    }
+                ],
+                previewHtml: '',
+                generatedCode: '',
+                showToast: false,
+                toastMessage: '',
+                debounceTimeout: null,
+                showColorPicker: false,
+                currentCategory: null,
+                selectedColor: '',
+                customColor: '',
+                editingCategoryKey: ''
+            },
+            mounted() {
+                this.generateCode();
+            },
+            methods: {
+                openColorPicker(categoryKey, category) {
+                    this.editingCategoryKey = categoryKey;
+                    this.currentCategory = category;
+                    this.selectedColor = category.color;
+                    this.customColor = category.color;
+                    this.showColorPicker = true;
+                },
+                
+                closeColorPicker() {
+                    this.showColorPicker = false;
+                    this.currentCategory = null;
+                    this.selectedColor = '';
+                    this.customColor = '';
+                },
+                
+                selectColor(color) {
+                    this.selectedColor = color;
+                    this.customColor = color;
+                },
+                
+                confirmColor() {
+                    if (this.editingCategoryKey && this.categories[this.editingCategoryKey]) {
+                        this.categories[this.editingCategoryKey].color = this.selectedColor || this.customColor;
+                        this.generateCode();
+                        this.showToastMessage(`已设置${this.categories[this.editingCategoryKey].label}颜色`);
+                    }
+                    this.closeColorPicker();
+                },
+                
+                generateCode() {
+                    if (!this.inputText) {
+                        this.previewHtml = '';
+                        this.generatedCode = '';
+                        return;
+                    }
+                    
+                    // 收集所有匹配项
+                    const matches = [];
+                    
+                    for (const [key, category] of Object.entries(this.categories)) {
+                        if (!category.enabled) continue;
+                        
+                        const color = category.color.replace('#', '');
+                        const rules = category.rules;
+                        
+                        rules.forEach(rule => {
+                            let match;
+                            while ((match = rule.exec(this.inputText)) !== null) {
+                                // 检查是否已经存在相同的匹配（避免重复）
+                                const isDuplicate = matches.some(m => 
+                                    m.start <= match.index && m.end >= match.index + match[0].length
+                                );
+                                
+                                if (!isDuplicate) {
+                                    matches.push({
+                                        text: match[0],
+                                        start: match.index,
+                                        end: match.index + match[0].length,
+                                        color: color,
+                                        category: key
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    
+                    // 按起始位置排序匹配项
+                    matches.sort((a, b) => a.start - b.start);
+                    
+                    // 构建代码和预览
+                    let lastIndex = 0;
+                    let code = '';
+                    let previewHtml = '';
+                    
+                    for (const match of matches) {
+                        // 添加前面的普通文本
+                        if (match.start > lastIndex) {
+                            const normalText = this.inputText.substring(lastIndex, match.start);
+                            code += normalText;
+                            previewHtml += normalText;
+                        }
+                        
+                        // 添加着色文本
+                        code += `#c${match.color}${match.text}`;
+                        previewHtml += `<span style="color: #${match.color}">${match.text}</span>`;
+                        
+                        lastIndex = match.end;
+                    }
+                    
+                    // 添加剩余的普通文本
+                    if (lastIndex < this.inputText.length) {
+                        const remainingText = this.inputText.substring(lastIndex);
+                        code += remainingText;
+                        previewHtml += remainingText;
+                    }
+                    
+                    this.previewHtml = previewHtml;
+                    this.generatedCode = code;
+                },
+                
+                debounceGenerateCode() {
+                    clearTimeout(this.debounceTimeout);
+                    this.debounceTimeout = setTimeout(() => {
+                        this.generateCode();
+                    }, 300);
+                },
+                
+                copyCode() {
+                    if (!this.generatedCode) return;
+                    
+                    const textArea = document.createElement('textarea');
+                    textArea.value = this.generatedCode;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            this.showToastMessage('代码已复制到剪贴板！');
+                        }
+                    } catch (err) {
+                        console.error('复制失败:', err);
+                        this.showToastMessage('复制失败，请手动复制');
+                    }
+                    
+                    document.body.removeChild(textArea);
+                },
+                
+                applyColorPreset(presetName) {
+                    const preset = this.colorPresets[presetName];
+                    if (preset) {
+                        for (const [key, color] of Object.entries(preset)) {
+                            if (this.categories[key]) {
+                                this.categories[key].color = color;
+                            }
+                        }
+                        this.generateCode();
+                        this.showToastMessage(`已应用${presetName}配色方案`);
+                    }
+                },
+                
+                resetColors() {
+                    const defaultColors = {
+                        price: "#ef4444",
+                        item: "#10b981",
+                        location: "#3b82f6",
+                        action: "#8b5cf6",
+                        number: "#f59e0b",
+                        pet: "#ec4899",
+                        school: "#f97316"
+                    };
+                    
+                    for (const key in this.categories) {
+                        if (defaultColors[key]) {
+                            this.categories[key].color = defaultColors[key];
+                        }
+                    }
+                    
+                    this.generateCode();
+                    this.showToastMessage('颜色已重置为默认值');
+                },
+                
+                loadExample(example) {
+                    this.inputText = example.content;
+                    this.generateCode();
+                    this.showToastMessage(`已加载"${example.title}"示例`);
+                },
+                
+                showToastMessage(message) {
+                    this.toastMessage = message;
+                    this.showToast = true;
+                    
+                    setTimeout(() => {
+                        this.showToast = false;
+                    }, 3000);
+                }
+            },
+            watch: {
+                categories: {
+                    deep: true,
+                    handler: 'generateCode'
+                }
+            }
+        });
+    </script>
+</body>
+</html>

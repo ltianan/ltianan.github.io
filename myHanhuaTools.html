@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦幻西游内容着色器 - 优化版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #4a4a8a;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #ffcc00;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .description {
+            color: #a0a0c0;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .settings-section {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #4a4a8a;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .input-section {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #4a4a8a;
+            background: rgba(10, 10, 20, 0.8);
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .category-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(30, 30, 50, 0.5);
+            border-radius: 8px;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .category-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .category-label {
+            min-width: 80px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .category-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #4a4a8a;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(to right, #3366ff, #6699ff);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .preset-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .preview-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(10, 10, 20, 0.6);
+            border-radius: 10px;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .preview-title {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-box {
+            min-height: 100px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .code-section {
+            margin-bottom: 25px;
+        }
+        
+        .code-output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            padding: 15px;
+            background: rgba(10, 10, 20, 0.6);
+            border-radius: 8px;
+            min-height: 100px;
+            overflow-x: auto;
+            border: 1px solid #4a4a8a;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #ff9900, #ffcc00);
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(to right, #3366ff, #6699ff);
+            color: white;
+        }
+        
+        .examples-section {
+            margin-top: 20px;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .example-card {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #4a4a8a;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-color: #ffcc00;
+        }
+        
+        .example-title {
+            color: #ffcc00;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .example-content {
+            color: #a0a0c0;
+            font-size: 14px;
+        }
+        
+        .hint {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ffcc00;
+            font-size: 14px;
+        }
+
+        .hidden-color-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>梦幻西游内容着色器 - 优化版</h1>
+            <p class="description">智能识别文本内容并自动着色，让聊天信息更醒目</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="settings-section">
+                <div class="input-group">
+                    <label>内容分类着色设置</label>
+                    <div class="category-settings" id="categoryContainer">
+                        <!-- 分类将通过JavaScript动态生成 -->
+                    </div>
+                
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="applyColorPreset('warm')">暖色系</button>
+                        <button class="preset-btn" onclick="applyColorPreset('cool')">冷色系</button>
+                        <button class="preset-btn" onclick="applyColorPreset('rainbow')">彩虹色</button>
+                        <button class="preset-btn" onclick="applyColorPreset('pastel')">柔和色</button>
+                        <button class="preset-btn" onclick="applyColorPreset('reset')">重置颜色</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="inputText">输入文本内容</label>
+                    <textarea id="inputText" placeholder="请输入要在游戏中显示的文本...">出售大海龟、大力金刚，CA交易，XL++++，DT LB MW NR 来组队</textarea>
+                </div>
+                
+                <div class="preview-section">
+                    <div class="preview-title">
+                        <span>预览效果</span>
+                        <span id="charCount">0 字符</span>
+                    </div>
+                    <div class="preview-box" id="preview"></div>
+                </div>
+                
+                <div class="code-section">
+                    <label for="codeOutput">生成的代码（点击下方复制按钮）</label>
+                    <div class="code-output" id="codeOutput"></div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="generateBtn">生成着色代码</button>
+                    <button id="copyBtn" class="copy-btn">复制代码</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="examples-section">
+            <label>常用示例（点击使用）</label>
+            <div class="examples-grid">
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">召唤兽交易</div>
+                    <div class="example-content">出售大海龟、巨蛙、海毛虫，CA交易，要的MMM</div>
+                </div>
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">门派组队</div>
+                    <div class="example-content">DT LB MW NR 来组队，AL抓鬼，Q4</div>
+                </div>
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">地点任务</div>
+                    <div class="example-content">去方寸山做任务，需要封系和辅助</div>
+                </div>
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">门派招募</div>
+                    <div class="example-content">方寸山收徒弟，要求等级≥50，有耐心</div>
+                </div>
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">出售物品</div>
+                    <div class="example-content">出售80级破血鞋子3000W，傲来国交易，要的MMM</div>
+                </div>
+                <div class="example-card" onclick="loadExample(this)">
+                    <div class="example-title">求购物品</div>
+                    <div class="example-content">求购高级必杀500W，高级连击800W，长安城交易</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hint">
+            <strong>使用说明：</strong> 系统会自动识别文本中的价格、物品、地点等信息并着色。
+        </div>
+    </div>
+
+    <script>
+        // 分类配置数据
+        const categoryConfig = {
+            price: {
+                label: "价格",
+                color: "#ff6464",
+                rules: [/\d+[万千亿WMKY]/g, /[\d.]+[万千亿WMKY]/g]
+            },
+            item: {
+                label: "物品",
+                color: "#64c864",
+                rules: [
+                    /[\u4e00-\u9fa5]{2,6}(靴|鞋|帽|盔|甲|衣|刀|剑|枪|扇|鞭|环|爪|锤|斧|腰带|项链|饰品)/g,
+                    /(高级|高)[\u4e00-\u9fa5]{2,4}/g,
+                    /[\u4e00-\u9fa5]{2,6}(决|要诀|兽决)/g,
+                    /[\u4e00-\u9fa5]{2,4}宝石/g,
+                    /[\u4e00-\u9fa5]{2,6}丹/g
+                ]
+            },
+            location: {
+                label: "地点",
+                color: "#6496ff",
+                rules: [
+                    /(长安城|建邺城|傲来国|长寿村|宝象国|朱紫国|西梁女国|女儿村|普陀山|五庄观|方寸山|天宫|龙宫|地府|魔王寨|狮驼岭|化生寺|大唐官府|月宫)/g,
+                    /(国境|野外|东海湾|江南野外|大唐境外|麒麟山|凤凰台|神兽乐园|御风林)/g,
+                    /(天台|XL|xl|AL|al|TT|tt|西凉|女国|驿站|商会|酒店|药店|铁匠铺|布店|饰品店|CA|ca|长安)/gi
+                ]
+            },
+            action: {
+                label: "动作",
+                color: "#c896ff",
+                rules: [
+                    /(出售|求购|收购|交易|打包|带走|要的|MMM|滴滴)/g,
+                    /(组队|来人|Q\d|来\d|差\d|速度|开车)/g,
+                    /(副本|活动|任务|帮战|比武|竞技)/g
+                ]
+            },
+            number: {
+                label: "数字",
+                color: "#ffc864",
+                rules: [/\d+/g]
+            },
+            pet: {
+                label: "召唤兽",
+                color: "#ff64aa",
+                rules: [
+                    /(大海龟|巨蛙|海毛虫|大蝙蝠|强盗|山贼|骷髅怪|羊头怪|蛤蟆精|狐狸精|黑熊精|花妖|牛头|马面|僵尸|野鬼|小龙女|狼|虾兵|蟹将|龟丞相|兔子怪|蜘蛛精|黑熊|白熊|黑山老妖|麒麟|凤凰|蛟龙|雨师|巡游天神|星灵仙子|芙蓉仙子|如意仙子|灵符女娲|律法女娲|幽灵|鬼将|净瓶女娲|吸血鬼|阴阳伞|大力金刚|夜罗刹|金刚狼|葫芦宝贝|藤蔓妖花|巨力神猿|修罗傀儡鬼|蜃气妖|金铙僧|曼珠沙华|长眉灵猴)/g
+                ]
+            },
+            school: {
+                label: "门派",
+                color: "#ffaa64",
+                rules: [
+                    /(大唐官府|方寸山|化生寺|女儿村|天宫|龙宫|五庄观|普陀山|阴曹地府|魔王寨|狮驼岭|盘丝洞|凌波城|无底洞|神木林|花果山|女魃墓|天机城|东海渊)/g,
+                    /(DT|SM|LB|LBC|MW|NR|HS|LG|DF|TG|WZ|FC|ST|PT|PS|WDD|SML|HG|NBM|TJC|DHY)/gi
+                ]
+            }
+        };
+
+        // 颜色预设方案
+        const colorPresets = {
+            warm: {
+                price: "#ff6666",
+                item: "#ff9966",
+                location: "#ffcc66",
+                action: "#ff6666",
+                number: "#ff9966",
+                pet: "#ff66aa",
+                school: "#ffaa66"
+            },
+            cool: {
+                price: "#6688ff",
+                item: "#66bbff",
+                location: "#66ddff",
+                action: "#6688ff",
+                number: "#66bbff",
+                pet: "#6688ff",
+                school: "#66aaff"
+            },
+            rainbow: {
+                price: "#ff6666",
+                item: "#ffcc66",
+                location: "#66ff66",
+                action: "#66ccff",
+                number: "#cc66ff",
+                pet: "#ff66cc",
+                school: "#ff9966"
+            },
+            pastel: {
+                price: "#ffb3ba",
+                item: "#ffdfba",
+                location: "#ffffba",
+                action: "#baffc9",
+                number: "#bae1ff",
+                pet: "#ff99cc",
+                school: "#ffcc99"
+            }
+        };
+
+        // 初始化
+        window.addEventListener('load', function() {
+            initCategorySettings();
+            initEventListeners();
+            generateCode();
+        });
+
+        // 初始化分类设置
+        function initCategorySettings() {
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = '';
+            
+            for (const [key, config] of Object.entries(categoryConfig)) {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-item';
+                categoryItem.innerHTML = `
+                    <input type="checkbox" class="category-checkbox" id="cb-${key}" checked>
+                    <label class="category-label" for="cb-${key}">${config.label}</label>
+                    <div class="category-color" id="color-${key}" style="background-color: ${config.color};"></div>
+                    <input type="color" id="input-${key}" value="${config.color}" class="hidden-color-input">
+                `;
+                container.appendChild(categoryItem);
+            }
+        }
+
+        // 初始化事件监听器
+        function initEventListeners() {
+            const inputText = document.getElementById('inputText');
+            const generateBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            // 文本输入事件
+            inputText.addEventListener('input', generateCode);
+            generateBtn.addEventListener('click', generateCode);
+            
+            // 复制代码事件
+            copyBtn.addEventListener('click', copyCode);
+            
+            // 颜色选择器事件
+            document.querySelectorAll('.category-color').forEach(preview => {
+                preview.addEventListener('click', function() {
+                    const inputId = this.id.replace('color', 'input');
+                    document.getElementById(inputId).click();
+                });
+            });
+            
+            // 颜色输入事件
+            document.querySelectorAll('.hidden-color-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const previewId = this.id.replace('input', 'color');
+                    document.getElementById(previewId).style.backgroundColor = this.value;
+                    generateCode();
+                });
+            });
+            
+            // 分类复选框事件
+            document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', generateCode);
+            });
+        }
+
+        // 生成代码
+        function generateCode() {
+            const text = document.getElementById('inputText').value;
+            const charCount = document.getElementById('charCount');
+            const preview = document.getElementById('preview');
+            const codeOutput = document.getElementById('codeOutput');
+            
+            if (!text) {
+                preview.innerHTML = '';
+                codeOutput.textContent = '';
+                charCount.textContent = '0 字符';
+                return;
+            }
+            
+            // 收集所有匹配项
+            const matches = [];
+            
+            for (const [key, config] of Object.entries(categoryConfig)) {
+                const checkbox = document.getElementById(`cb-${key}`);
+                if (!checkbox || !checkbox.checked) continue;
+                
+                const color = document.getElementById(`input-${key}`).value.replace('#', '');
+                const rules = config.rules;
+                
+                rules.forEach(rule => {
+                    let match;
+                    while ((match = rule.exec(text)) !== null) {
+                        // 检查是否已经存在相同的匹配（避免重复）
+                        const isDuplicate = matches.some(m => 
+                            m.start <= match.index && m.end >= match.index + match[0].length
+                        );
+                        
+                        if (!isDuplicate) {
+                            matches.push({
+                                text: match[0],
+                                start: match.index,
+                                end: match.index + match[0].length,
+                                color: color,
+                                category: key
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // 按起始位置排序匹配项
+            matches.sort((a, b) => a.start - b.start);
+            
+            // 构建代码和预览
+            let lastIndex = 0;
+            let code = '';
+            let previewHtml = '';
+            
+            for (const match of matches) {
+                // 添加前面的普通文本
+                if (match.start > lastIndex) {
+                    const normalText = text.substring(lastIndex, match.start);
+                    code += normalText;
+                    previewHtml += normalText;
+                }
+                
+                // 添加着色文本
+                code += `#c${match.color}${match.text}`;
+                previewHtml += `<span style="color: #${match.color}">${match.text}</span>`;
+                
+                lastIndex = match.end;
+            }
+            
+            // 添加剩余的普通文本
+            if (lastIndex < text.length) {
+                const remainingText = text.substring(lastIndex);
+                code += remainingText;
+                previewHtml += remainingText;
+            }
+            
+            preview.innerHTML = previewHtml;
+            codeOutput.textContent = code;
+            charCount.textContent = `${text.length} 字符`;
+        }
+
+        // 复制代码
+        function copyCode() {
+            const text = document.getElementById('codeOutput').textContent;
+            const copyBtn = document.getElementById('copyBtn');
+            
+            if (!text) return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制代码';
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                // 备用复制方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制代码';
+                }, 2000);
+            });
+        }
+
+        // 应用颜色预设
+        function applyColorPreset(presetName) {
+            if (presetName === 'reset') {
+                // 重置为默认颜色
+                for (const [key, config] of Object.entries(categoryConfig)) {
+                    const input = document.getElementById(`input-${key}`);
+                    if (input) {
+                        input.value = config.color;
+                        const preview = document.getElementById(`color-${key}`);
+                        if (preview) {
+                            preview.style.backgroundColor = config.color;
+                        }
+                    }
+                }
+            } else {
+                // 应用预设方案
+                const preset = colorPresets[presetName];
+                if (preset) {
+                    for (const [key, color] of Object.entries(preset)) {
+                        const input = document.getElementById(`input-${key}`);
+                        if (input) {
+                            input.value = color;
+                            const preview = document.getElementById(`color-${key}`);
+                            if (preview) {
+                                preview.style.backgroundColor = color;
+                            }
+                        }
+                    }
+                }
+            }
+            generateCode();
+        }
+
+        // 加载示例
+        function loadExample(element) {
+            const exampleContent = element.querySelector('.example-content').textContent;
+            document.getElementById('inputText').value = exampleContent;
+            generateCode();
+        }
+    </script>
+</body>
+</html>
