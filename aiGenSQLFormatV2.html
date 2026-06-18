@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL Formatter — 逗号紧跟 · 括号内单行</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,monospace;
+  background:#f0f2f5;color:#1e293b;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;padding:32px 16px;
+}
+.header{width:100%;max-width:1400px;margin-bottom:18px}
+.header h1{font-size:20px;font-weight:700;color:#4338ca;letter-spacing:-.02em}
+.header p{font-size:13px;color:#64748b;margin-top:2px}
+.card{
+  width:100%;max-width:1400px;background:#fff;border-radius:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,.06);overflow:hidden;
+}
+.toolbar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  padding:14px 24px;border-bottom:1px solid #e9edf2;background:#fafbfc;
+}
+.cfg{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#334155;background:#f1f5f9;
+  border-radius:999px;padding:3px 12px 3px 14px;}
+.cfg label{font-weight:500}
+.cfg select,.cfg input[type=number]{
+  border:none;background:#fff;padding:3px 8px;border-radius:20px;font-size:12.5px;
+  outline:1px solid #cbd5e1;width:62px;text-align:center;
+}
+.cfg input[type=number]{width:48px}
+.btn{padding:7px 20px;border-radius:999px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:.12s}
+.btn-primary{background:#4338ca;color:#fff;box-shadow:0 2px 8px rgba(67,56,202,.25)}
+.btn-primary:hover{background:#3730a3}
+.btn-outline{background:#fff;color:#334155;border:1px solid #cbd5e1}
+.btn-outline:hover{background:#f1f5f9}
+.spacer{flex:1}
+.panels{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:860px){.panels{grid-template-columns:1fr}}
+.panel{border-right:1px solid #e9edf2;display:flex;flex-direction:column}
+.panel:last-child{border-right:none}
+.panel-head{
+  font-size:11.5px;font-weight:600;color:#64748b;text-transform:uppercase;
+  letter-spacing:.06em;padding:10px 18px 4px;background:#fff;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.panel-head .note{font-weight:400;color:#94a3b8;text-transform:none;font-size:11px}
+.panel textarea{
+  flex:1;resize:none;border:none;outline:none;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-size:12.8px;line-height:2;padding:10px 18px 14px;
+  background:#fff;color:#0f172a;white-space:pre;overflow-x:auto;min-height:500px;
+  tab-size:4;
+}
+.panel textarea:focus{background:#fefffe}
+.panel textarea[readonly]{background:#fcfdfe;color:#1e293b}
+.foot{
+  padding:10px 24px;border-top:1px solid #e9edf2;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11.5px;color:#94a3b8;background:#fafbfc;border-radius:0 0 20px 20px;
+}
+.badges span{
+  background:#e9edf2;color:#334155;padding:2px 10px;border-radius:999px;font-size:11px;margin-right:4px;
+}
+.copy-btn{
+  background:none;border:none;color:#4338ca;font-weight:600;font-size:12.5px;
+  cursor:pointer;padding:4px 10px;border-radius:999px;
+}
+.copy-btn:hover{background:#eef2ff}
+.toast{position:fixed;bottom:28px;right:32px;background:#0f172a;color:#fff;padding:8px 20px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✦ SQL Formatter</h1>
+  <p>逗号紧跟 · 括号内永不换行 · WHERE条件分行 · 字段1格 / 表2格 · 行备注→块注释</p>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="cfg"><label>关键字</label>
+      <select id="kwCase"><option value="upper">大写</option><option value="lower">小写</option></select>
+    </div>
+    <div class="cfg"><label>缩进</label>
+      <select id="indentType"><option value="space">空格</option><option value="tab">Tab</option></select>
+      <input type="number" id="indentW" value="4" min="2" max="8" step="2">
+    </div>
+    <button class="btn btn-primary" id="fmtBtn">格式化</button>
+    <button class="btn btn-outline" id="clrBtn">清空</button>
+    <span class="spacer"></span>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-head">原始 SQL <span class="note">粘贴后点格式化 或 Ctrl+Enter</span></div>
+      <textarea id="inp" spellcheck="false">select (select regionname from gdyy.sa_db_region x where x.regionid=a.region)
+,'无线商话',c.groupid,d.custname,a.servnumber,( select dictname from gdyy.sa_db_dictitem x where x.groupid='US' and x.dictid=a.status)
+,a.createdate,a.statusdate,b.memservnumber,(select dictname from gdyy.sa_db_dictitem x where x.groupid='MemberStatus' and x.dictid=b.status ),
+b.startdate from mgsj_gdyy.cm_subs_subscriber a
+,gdyy.cm_group_member b -- jcfw.TS_E_SJDCRM_CORP_MBR_D 日全量表
+,
+(select groupid,custid from gdyy.cm_cu_group union  select groupid,custid from mgsj_gdyy.cm_cu_group_his) c, gdyy.cm_cu_customer  d
+where a.prodid='2046' and a.subsid=b.groupoid and c.custid=a.custid and d.custid=c.custid  ;</textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-head">格式化结果 <span class="note">逗号紧跟 · 括号内单行 · WHERE分行</span></div>
+      <textarea id="out" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="badges">
+      <span>逗号紧跟</span><span>括号内单行</span><span>WHERE分行</span><span>字段1表2</span>
+    </div>
+    <button class="copy-btn" id="cpyBtn">📋 复制结果</button>
+  </div>
+</div>
+<div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<script>
+(function(){
+const SQL_KW=['SELECT','FROM','WHERE','AND','OR','UNION','ALL','ON','INNER','LEFT','RIGHT','OUTER','JOIN',
+  'ORDER BY','GROUP BY','HAVING','LIMIT','OFFSET','AS','NOT','NULL','IS','IN','EXISTS',
+  'BETWEEN','LIKE','CASE','WHEN','THEN','ELSE','END','DISTINCT','TOP','WITH','RECURSIVE'];
+
+function fmtSql(sql,kwCase,ichar,isz){
+  if(!sql||!sql.trim())return'';
+  const u=ichar==='tab'?'\t':' '.repeat(isz||4),
+        fi=u.repeat(1),ti=u.repeat(2);
+  let s=sql.replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n');
+
+  /* 1 保护字符串 */
+  const strs=[];let si=0;
+  s=s.replace(/'[^']*'/g,m=>{const k=`__S${si}__`;strs.push(m);si++;return k;});
+
+  /* 2 行注释→块注释 & 保护块注释 */
+  const cmts=[];let ci=0;
+  s=s.replace(/\/\*[\s\S]*?\*\//g,m=>{const k=`__C${ci}__`;cmts.push(m);ci++;return k;});
+  s=s.replace(/--(.+?)(?:\n|$)/g,(_,c)=>{let t=c.replace(/\n$/,'').trim();if(t){const k=`__C${ci}__`;cmts.push(`/* ${t} */`);ci++;return k+'\n'}return'\n'});
+
+  /* 3 【最高优先级】提取所有括号内容为占位符 */
+  const brk=[];let bi=0,depth=0,buf='',txt='';
+  for(let i=0;i<s.length;i++){
+    const ch=s[i];
+    if(ch==='('){if(!depth){buf='(';depth=1}else{buf+=ch;depth++}}
+    else if(ch===')'){depth--;buf+=ch;if(!depth){const k=`__B${bi}__`;brk.push(buf);txt+=k;bi++;buf=''}}
+    else{if(depth)buf+=ch;else txt+=ch}
+  }
+  if(buf)txt+=buf;
+
+  /* 4 在括号外做换行 */
+  let w=txt;
+  w=w.replace(/\bfrom\b/gi,'\nFROM');
+  w=w.replace(/\bwhere\b/gi,'\nWHERE');
+  w=w.replace(/\border by\b/gi,'\nORDER BY');
+  w=w.replace(/\bgroup by\b/gi,'\nGROUP BY');
+  w=w.replace(/\bhaving\b/gi,'\nHAVING');
+  w=w.replace(/\bunion\b/gi,'\nUNION');
+  w=w.replace(/\band\b/gi,'\nAND');
+  w=w.replace(/\bor\b/gi,'\nOR');
+  
+  /* 5 逗号换行 —— 修复关键逻辑 */
+  // 先将所有逗号换行
+  w=w.replace(/,/g,'\n,');
+  // 特殊处理：如果逗号行后面紧跟FROM/WHERE，应该合并
+  // 但我们需要保留逗号，只是不换行
+  // 更精准的修复：将 ",\nFROM" 中的逗号移到FROM后面
+  w=w.replace(/,\nFROM/g,'\nFROM');
+  w=w.replace(/,\nWHERE/g,'\nWHERE');
+  w=w.replace(/,\nORDER\s+BY/g,'\nORDER BY');
+  w=w.replace(/,\nGROUP\s+BY/g,'\nGROUP BY');
+  w=w.replace(/,\nHAVING/g,'\nHAVING');
+  w=w.replace(/,\nUNION/g,'\nUNION');
+  w=w.replace(/,\nAND/g,'\nAND');
+  w=w.replace(/,\nOR/g,'\nOR');
+
+  /* 6 还原括号内容——压缩为单行 */
+  for(let i=0;i<brk.length;i++){
+    let inner=brk[i].slice(1,-1).trim().replace(/\s+/g,' ');
+    if(kwCase==='upper')inner=inner.replace(new RegExp('\\b('+SQL_KW.join('|')+')\\b','gi'),m=>m.toUpperCase());
+    else inner=inner.replace(new RegExp('\\b('+SQL_KW.join('|')+')\\b','gi'),m=>m.toLowerCase());
+    brk[i]='('+inner+')';
+    w=w.replace(`__B${i}__`,brk[i]);
+  }
+
+  /* 7 恢复注释/字符串 */
+  for(let i=0;i<cmts.length;i++)w=w.replace(`__C${i}__`,cmts[i]);
+  for(let i=0;i<strs.length;i++)w=w.replace(`__S${i}__`,strs[i]);
+
+  /* 8 顶层关键字大小写 */
+  if(kwCase==='upper')w=w.replace(new RegExp('\\b('+SQL_KW.join('|')+')\\b','gi'),m=>m.toUpperCase());
+  else w=w.replace(new RegExp('\\b('+SQL_KW.join('|')+')\\b','gi'),m=>m.toLowerCase());
+
+  /* 9 处理逗号紧跟 */
+  // 去掉逗号后面的空格
+  w=w.replace(/,\s+/g,',');
+  // 确保逗号行以逗号开头
+  w=w.replace(/^,/gm,',');
+
+  /* 10 缩进 */
+  const lines=w.split('\n');
+  let out=[],inFrom=false,inWh=false;
+  for(const ln of lines){
+    let t=ln.trimEnd();
+    if(!t)continue;
+    const uu=t.toUpperCase();
+    
+    if(uu.startsWith('FROM')||uu.startsWith('JOIN')||uu.startsWith('INNER JOIN')||uu.startsWith('LEFT JOIN')||uu.startsWith('RIGHT JOIN')||uu.startsWith('OUTER JOIN')){inFrom=true;inWh=false}
+    else if(uu.startsWith('WHERE')){inFrom=false;inWh=true}
+    else if(uu.startsWith('UNION')||uu.startsWith('ORDER BY')||uu.startsWith('GROUP BY')||uu.startsWith('HAVING')||uu.startsWith('LIMIT')){inFrom=false;inWh=false}
+    
+    let lv=0;
+    if(uu.startsWith('SELECT')||uu.startsWith('FROM')||uu.startsWith('JOIN')||uu.startsWith('INNER JOIN')||uu.startsWith('LEFT JOIN')||uu.startsWith('RIGHT JOIN')||uu.startsWith('OUTER JOIN')||uu.startsWith('WHERE')||uu.startsWith('UNION')||uu.startsWith('ORDER BY')||uu.startsWith('GROUP BY')||uu.startsWith('HAVING')||uu.startsWith('LIMIT'))lv=0;
+    else if(inWh){
+      // WHERE条件中的AND/OR，与字段同级缩进
+      lv=1;
+    }else if(inFrom)lv=2;
+    else lv=1;
+    
+    out.push((lv===1?fi:(lv===2?ti:''))+t);
+  }
+  let r=out.join('\n').replace(/\s*;\s*$/,';');
+  return r;
+}
+
+const inp=document.getElementById('inp'),
+      out=document.getElementById('out'),
+      fmtBtn=document.getElementById('fmtBtn'),
+      clrBtn=document.getElementById('clrBtn'),
+      cpyBtn=document.getElementById('cpyBtn'),
+      toast=document.getElementById('toast');
+
+function go(){
+  out.value=fmtSql(
+    inp.value,
+    document.getElementById('kwCase').value,
+    document.getElementById('indentType').value,
+    +document.getElementById('indentW').value
+  );
+}
+fmtBtn.onclick=go;
+clrBtn.onclick=()=>{inp.value='';out.value=''};
+inp.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();go()}});
+cpyBtn.onclick=()=>{if(!out.value)return;navigator.clipboard.writeText(out.value).then(()=>{toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)})};
+window.addEventListener('DOMContentLoaded',go);
+})();
+</script>
+</body>
+</html>
